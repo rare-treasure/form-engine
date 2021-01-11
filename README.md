@@ -6,7 +6,7 @@
  * @Description: init
 -->
 # 介绍
-form-engine基于 [vue](https://www.npmjs.com/package/vue) + element-ui, 可解决各种各样的表单需求。
+form-engine基于 [vue](https://www.npmjs.com/package/vue) + [element-ui](https://element.eleme.cn/#/zh-CN/component/installation) , 可解决各种各样的表单需求。
 
 * 设计理念
   * 面向现代浏览器，高效的简洁 API 设计，减少不必要的冗余代码
@@ -43,7 +43,13 @@ form-engine基于 [vue](https://www.npmjs.com/package/vue) + element-ui, 可解�
 暂无
 
 ## 文档
-暂无
+
+### value
+- Type: String
+- Default: undefined
+
+The value of the QR code.
+
 <!-- 
 [💡 使用指南]()
 [👉 查看演示]()

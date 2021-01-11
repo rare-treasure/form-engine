@@ -1,10 +1,12 @@
 {
   "name": "v-form-engine",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "typings": "types/index.d.ts",
+  "module": "src/index.ts",
   "description": "一个基于 vue + element-ui 的 PC 端表单引擎。支持灵活的配置项、编辑/查看两种视图、自定义模板/插槽、溢出隐藏、双击复制等...",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "node ./build/build.js",
     "lint": "vue-cli-service lint"
   },
   "peerDependencies": {
@@ -13,10 +15,15 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "element-ui": "^2.13.2",
-    "vue": "^2.6.11",
+    "v-form-engine": "^1.0.0",
+    "vue": "^2.6.12",
     "vue-property-decorator": "^9.0.0"
   },
   "devDependencies": {
+    "@rollup/plugin-babel": "^5.2.2",
+    "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^11.0.1",
     "@types/webpack-env": "^1.15.3",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
@@ -26,27 +33,14 @@
     "@vue/cli-service": "~4.5.0",
     "@vue/eslint-config-airbnb": "^5.1.0",
     "@vue/eslint-config-typescript": "^5.1.0",
-    "babel-plugin-component": "^1.1.1",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
+    "rollup": "^2.36.1",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-vue": "^6.0.0",
     "typescript": "~3.9.3",
     "vue-class-component": "^7.2.6",
     "vue-template-compiler": "^2.6.11"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended",
-      "@vue/typescript/recommended"
-    ],
-    "parserOptions": {
-      "ecmaVersion": 2020
-    },
-    "rules": {}
   },
   "repository": {
     "type": "git",
@@ -57,5 +51,10 @@
   "bugs": {
     "url": "https://github.com/xiaofan9/form-engine/issues"
   },
-  "homepage": "https://github.com/xiaofan9/form-engine#readme"
+  "homepage": "https://github.com/xiaofan9/form-engine#readme",
+  "files": [
+    "src",
+    "types",
+    "dist"
+  ]
 }

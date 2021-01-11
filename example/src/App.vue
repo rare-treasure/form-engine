@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <form-engine :config="config"></form-engine>
+    <form-engine :items="items" style="width: 600px"></form-engine>
   </div>
 </template>
 
@@ -9,7 +9,7 @@ import { Component, Vue } from 'vue-property-decorator'
 
 @Component
 export default class App extends Vue {
-  config = [
+  items = [
     {
       label: 'test1',
       prop: 'test1'
