@@ -14,9 +14,11 @@
             v-if="!item.formSlot"
             :size="size"
             :label-width="item.labelWidth || labelWidth"
-            :label="item.label"
             :style="{ width: item.width || width || '' + 'px' }"
             :prop="item.prop"
+            :label="item.label"
+            :rules="item.rules"
+            :ref="(item.props || {}).ref || item.prop"
             v-bind="item.props"
             v-on="item.on"
           >
@@ -52,6 +54,11 @@
           </el-form-item>
           <slot v-else-if="item.prop" :name="item.prop"></slot>
         </el-col>
+        <el-col
+          v-if="item.row && item.span && item.span < 24"
+          :key="idx"
+          :span="24 - item.span">
+        </el-col>
       </template>
       <slot></slot>
     </el-row>
@@ -69,17 +76,19 @@ import {
 
 type Item = {
   span: number
+  row: number
   labelWidth: string
   width: number & string
   prop: string
   formSlot: boolean
   slot: boolean
-  type: string
+  rules: Record<string, unknown>
   label: string
-  props: FormItem
-  on: Record<string, () => void>
   placeholder: string
   size: string
+  type: string
+  props: FormItem
+  on: Record<string, () => void>
   subProps: Select | DatePicker | Input | Button
   subOn: Record<string, () => void>
 };
@@ -98,13 +107,15 @@ export default class FormEngine extends Vue {
     type: String,
     default: 'small'
   })
-  size: any;
+  size!: string;
 
   @Prop({
     type: Object,
     default: () => ({})
   })
-  rules: any;
+  rules!: {
+    [key: string]: any
+  };
 
   @Prop({
     type: String,
@@ -121,7 +132,9 @@ export default class FormEngine extends Vue {
     type: Object,
     default: () => ({})
   })
-  data: any;
+  data!: {
+    [key: string]: any
+  };
 
   @Watch('config')
   watchConfig() {
@@ -168,7 +181,8 @@ export default class FormEngine extends Vue {
   }
 
   getPlaceholder(item: Item) {
-    const text = item.type === 'select' || item.type === 'input' ? `请${item.type === 'select' ? '选择' : '输入'}` : ''
+    const cName = this.getComponentName(item.type)
+    const text = /(input|select)$/.test(cName) ? `请${item.type === 'select' ? '选择' : '输入'}` : ''
     const subProps = (item?.subProps || {}) as {
       disabled: boolean
       readonly: boolean
@@ -206,16 +220,27 @@ export default class FormEngine extends Vue {
     })
   }
 
-  clearValidate() {
-    this.$refs.form.clearValidate()
+  clearValidate(props: string[] | string = '') {
+    if (this.$refs?.form) this.$refs.form.clearValidate(props)
   }
 
   resetFields() {
-    this.$refs.form.resetFields()
+    if (this.$refs?.form) this.$refs.form.resetFields()
   }
 
-  validate() {
-    return this.$refs.form.validate().then(() => Promise.resolve(this.formData))
+  validateField(props: string[] | string, cb: (errorMessage: string) => void) {
+    if (this.$refs?.form) this.$refs.form.validateField(props, cb)
+  }
+
+  validate(cb: (isValid: boolean, invalidFields: object, data: {
+    [key: string]: any
+  }) => void) {
+    if (!cb) {
+      return this.$refs.form.validate().then(() => Promise.resolve(this.formData))
+    }
+    return this.$refs.form.validate(
+      (isValid, invalidFields) => cb(isValid, invalidFields, this.formData)
+    )
   }
 }
 </script>

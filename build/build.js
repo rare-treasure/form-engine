@@ -8,11 +8,12 @@ const { nodeResolve } = require('@rollup/plugin-node-resolve')
 const { terser } = require('rollup-plugin-terser')
 const { default: babel } = require('@rollup/plugin-babel')
 const cjs = require('@rollup/plugin-commonjs')
+const typescript = require('rollup-plugin-typescript2')
 const pkg = require('../package.json')
 
 const deps = Object.keys(pkg.dependencies)
 const foldPath = path.resolve(__dirname, `..`)
-const input = path.resolve(foldPath, 'src/index.js')
+const input = path.resolve(foldPath, 'src/index.ts')
 const outputConfig = {
   'esm': {
     format: 'es',
@@ -51,6 +52,7 @@ const runBuild = async () => {
     const inputOptions = {
       input,
       plugins: [
+        typescript(),
         nodeResolve({
           extensions: ['.mjs', '.js', '.json', '.node', '.vue'],
         }),
