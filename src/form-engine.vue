@@ -1,81 +1,61 @@
 <template>
-  <el-form class="form-engine" :size="size" :rules="newRules" :model="formData" ref="form">
+  <el-form
+    class="form-engine"
+    v-bind="$attrs"
+    v-on="$listeners"
+    :size="size"
+    :rules="newRules"
+    :model="formData"
+    ref="form">
     <el-row>
       <template v-for="(item, idx) of items">
         <el-col :key="idx" :span="item.span || 12">
           <el-form-item
+            v-if="!item.formSlot"
             :size="size"
             :label-width="item.labelWidth || labelWidth"
             :label="item.label"
-            :style="{ width: item.width || (much ? width : '') + 'px' }"
+            :style="{ width: item.width || width || '' + 'px' }"
             :prop="item.prop"
+            v-bind="item.props"
+            v-on="item.on"
           >
             <slot v-if="item.slot" :name="item.prop"></slot>
             <template v-else>
-              <el-input
-                v-if="!item.type || item.type === 'input' || item.type === 'textarea'"
-                :type="item.type"
+              <component
+                v-bind="item.subProps"
+                v-on="item.subOn"
                 :size="item.size || size"
-                :readonly="item.readonly"
-                :disabled="item.disabled"
-                :placeholder="
-                  item.placeholder || (item.disabled || item.readonly ? '' : '请输入' + item.label)
-                "
-                v-model="formData[item.prop]"
-                :clearable="item.clearable"
-                :maxlength="item.maxlength"
-                :rows="item.rows"
-              ></el-input>
-              <div v-if="item.type === 'textarea' && item.maxlength" class="text-limit">
-                {{ formData[item.prop].length }}/{{ item.maxlength }}
-              </div>
-              <el-date-picker
-                :size="item.size || size"
-                v-if="checkType(item.type, 'date')"
-                :type="item.type"
-                :clearable="item.clearable"
-                :readonly="item.readonly"
-                :disabled="item.disabled"
-                :value-format="item.valueFormat || 'yyyy-MM-dd'"
-                :range-separator="item.rangeSeparator || '至'"
-                :start-placeholder="item.startPlaceholder || '开始日期'"
-                :end-placeholder="item.endPlaceholder || '结束日期'"
+                :placeholder="getPlaceholder(item)"
+                v-if="getComponentName(item.type)"
+                :is="getComponentName(item.type)"
                 v-model="formData[item.prop]"
               >
-              </el-date-picker>
-              <el-select
-                v-if="item.type === 'select'"
-                :size="item.size || size"
-                :placeholder="
-                  item.placeholder || (item.disabled || item.readonly ? '' : '请选择' + item.label)
-                "
-                :clearable="item.clearable"
-                :disabled="item.disabled || item.readonly"
-                v-model="formData[item.prop]"
-                :multiple="item.multiple"
-                :class="{ 'select-only': item.readonly }"
+                <template v-if="item.type === 'select'">
+                  <el-option
+                    v-for="(subItem, idx) of item.options || []"
+                    :key="idx"
+                    :disabled="subItem.disabled"
+                    :value="subItem.value"
+                    :label="subItem.label"
+                  ></el-option>
+                </template>
+              </component>
+              <span
+                v-bind="item.subProps"
+                v-on="item.subOn"
+                v-else-if="item.type === 'text'"
               >
-                <el-option
-                  v-for="(subItem, idx) of item.options || []"
-                  :key="idx"
-                  :disabled="subItem.disabled"
-                  :value="subItem.value"
-                  :label="subItem.label"
-                ></el-option>
-              </el-select>
-              <el-button v-if="item.type === 'button'" @click="item.click">{{
-                item.text
-              }}</el-button>
-              <span v-if="item.type === 'text'">
                 {{ formData[item.prop] }}
               </span>
             </template>
           </el-form-item>
+          <slot v-else-if="item.prop" :name="item.prop"></slot>
         </el-col>
       </template>
+      <slot></slot>
     </el-row>
-
-    <slot></slot>
+    <slot name="independent"></slot>
   </el-form>
 </template>
 
@@ -83,7 +63,26 @@
 import {
   Component, Vue, Watch, Prop
 } from 'vue-property-decorator'
-import { Form } from 'element-ui'
+import {
+  FormItem, Button, Input, DatePicker, Select, Form
+} from 'element-ui'
+
+type Item = {
+  span: number
+  labelWidth: string
+  width: number & string
+  prop: string
+  formSlot: boolean
+  slot: boolean
+  type: string
+  label: string
+  props: FormItem
+  on: Record<string, () => void>
+  placeholder: string
+  size: string
+  subProps: Select | DatePicker | Input | Button
+  subOn: Record<string, () => void>
+};
 
 @Component
 export default class FormEngine extends Vue {
@@ -93,7 +92,7 @@ export default class FormEngine extends Vue {
     type: Array,
     default: () => []
   })
-  items: any;
+  items!: Item[];
 
   @Prop({
     type: String,
@@ -112,6 +111,11 @@ export default class FormEngine extends Vue {
     default: '80px'
   })
   labelWidth?: string;
+
+  @Prop({
+    type: String
+  })
+  width?: string;
 
   @Prop({
     type: Object,
@@ -145,8 +149,32 @@ export default class FormEngine extends Vue {
     this.init()
   }
 
-  checkType(type = '', nowType = '') {
-    return type.indexOf(nowType) > -1
+  getComponentName(type: string) {
+    let name = ''
+
+    const checkType = (type = '', nowType = '') => type.indexOf(nowType) > -1
+
+    if (!type || type === 'input' || type === 'textarea') {
+      name = 'el-input'
+    } else if (type === 'select') {
+      name = 'el-select'
+    } else if (checkType(type, 'date')) {
+      name = 'el-date-picker'
+    } else if (type === 'button') {
+      name = 'el-button'
+    }
+
+    return name
+  }
+
+  getPlaceholder(item: Item) {
+    const text = item.type === 'select' || item.type === 'input' ? `请${item.type === 'select' ? '选择' : '输入'}` : ''
+    const subProps = (item?.subProps || {}) as {
+      disabled: boolean
+      readonly: boolean
+    }
+
+    return item.placeholder || (subProps?.disabled || subProps?.readonly || !text ? '' : `${text + item.label}`)
   }
 
   init() {
