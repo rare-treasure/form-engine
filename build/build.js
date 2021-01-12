@@ -19,15 +19,15 @@ const outputConfig = {
     format: 'esm',
     file: path.resolve(foldPath, `dist/${pkg.name}.esm.js`),
   },
-  // 'umd': {
-  //   format: 'umd',
-  //   file: path.resolve(foldPath, `dist/${pkg.name}.js`),
-  //   name: pkg.name,
-  //   globals: {
-  //     'vue': 'Vue',
-  //     'element-ui': 'ELEMENT'
-  //   }
-  // }
+  'umd': {
+    format: 'umd',
+    file: path.resolve(foldPath, `dist/${pkg.name}.js`),
+    name: pkg.name,
+    globals: {
+      'vue': 'Vue',
+      'element-ui': 'ELEMENT'
+    }
+  }
 }
 
 const runBuild = async () => {
@@ -38,13 +38,7 @@ const runBuild = async () => {
 
   async function build(name) {
     if (!name) return
-    const extendPlugins = name === 'umd' ?[
-      cjs({
-        // 开启混合模式转换
-        transformMixedEsModules: true,
-        sourceMap: false
-      }),
-    ] : []
+    const extendPlugins = []
 
     const esmTerser = name === 'esm' ? {
       compress: {
@@ -64,19 +58,17 @@ const runBuild = async () => {
           target: 'browser',
           css: false,
         }),
-        // cjs({
-        //   // 开启混合模式转换
-        //   transformMixedEsModules: true,
-        //   sourceMap: false
-        // }),
-        // babel({ babelHelpers: 'runtime', extensions: [
-        //   '.js', '.jsx', '.es6', '.es', '.mjs', '.ts', '.tsx', '.vue'
-        // ] }),
+        cjs({
+          // 开启混合模式转换
+          transformMixedEsModules: true,
+          sourceMap: false
+        }),
+        babel({ 
+          babelHelpers: 'runtime', 
+          extensions: ['.js', '.jsx', '.mjs', '.ts', '.tsx', '.vue']
+        }),
         json(),
         terser(esmTerser),
-        // getBabelOutputPlugin({
-        //   configFile: path.resolve(__dirname, "..", 'babel.config.js'),
-        // }),
         ...extendPlugins
       ],
       external(id) {
@@ -92,8 +84,6 @@ const runBuild = async () => {
     const { output } = await bundle.generate(outOptions)
 
     console.timeEnd(chalk.green('create ' + outOptions.file + ' done'))
-
-    console.log(output)
 
     await bundle.write(outOptions)
     index++

@@ -7,7 +7,7 @@
     :rules="newRules"
     :model="formData"
     ref="form">
-    <el-row>
+    <el-row v-bind="rowProps" v-on="rowOn">
       <template v-for="(item, idx) of items">
         <el-col :key="idx" :span="item.span || 12">
           <el-form-item
@@ -135,6 +135,20 @@ export default class FormEngine extends Vue {
   data!: {
     [key: string]: any
   };
+
+  @Prop({
+    type: Object,
+    default: () => ({})
+  })
+  rowProps!: {
+    [key: string]: any
+  };
+
+  @Prop({
+    type: Object,
+    default: () => ({})
+  })
+  rowOn!: Record<string, () => void>
 
   @Watch('config')
   watchConfig() {
