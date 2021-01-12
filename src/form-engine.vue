@@ -5,7 +5,7 @@
     v-on="$listeners"
     :size="size"
     :rules="newRules"
-    :model="formData"
+    :model="newFormData"
     ref="form">
     <el-row v-bind="rowProps" v-on="rowOn">
       <template v-for="(item, idx) of items">
@@ -30,9 +30,9 @@
               v-if="item.slot"
               :name="item.prop"
               :item="item"
-              :value="formData[item.prop]"
+              :value="newFormData[item.prop]"
               :items="items"
-              :data="formData">
+              :form-data="newFormData">
             </slot>
             <template v-else>
               <component
@@ -42,7 +42,7 @@
                 :placeholder="getPlaceholder(item)"
                 v-if="getComponentName(item.type)"
                 :is="getComponentName(item.type)"
-                v-model="formData[item.prop]"
+                v-model="newFormData[item.prop]"
               >
                 <template v-if="item.type === 'select'">
                   <el-option
@@ -59,17 +59,17 @@
                 v-on="item.subOn"
                 v-else-if="item.type === 'text'"
               >
-                {{ formData[item.prop] }}
+                {{ newFormData[item.prop] }}
               </span>
             </template>
           </el-form-item>
           <slot
             v-else-if="item.prop"
             :item="item"
-            :value="formData[item.prop]"
+            :value="newFormData[item.prop]"
             :rule="newRules[item.prop]"
             :items="items"
-            :data="formData"
+            :form-data="newFormData"
             :rules="newRules"
             :name="item.prop">
           </slot>
@@ -80,9 +80,9 @@
           :span="24 - item.span">
         </el-col>
       </template>
-      <slot :items="items" :data="formData" :rules="newRules"></slot>
+      <slot :items="items" :form-data="newFormData" :rules="newRules"></slot>
     </el-row>
-    <slot name="independent" :items="items" :data="formData" :rules="newRules"></slot>
+    <slot name="independent" :items="items" :form-data="newFormData" :rules="newRules"></slot>
   </el-form>
 </template>
 
@@ -93,12 +93,13 @@ import {
 import {
   FormItem, Button, Input, DatePicker, Select, Form
 } from 'element-ui'
+import { merge } from 'lodash-es'
 
 type Item = {
   span: number
   row: number
   labelWidth: string
-  width: number & string
+  width: number | string
   prop: string
   formSlot: boolean
   required: boolean
@@ -114,10 +115,10 @@ type Item = {
   subOn: Record<string, () => void>
 };
 
-@Component
+@Component({
+  name: 'form-engine'
+})
 export default class FormEngine extends Vue {
-  name = 'form-engine';
-
   @Prop({
     type: Array,
     default: () => []
@@ -153,7 +154,7 @@ export default class FormEngine extends Vue {
     type: Object,
     default: () => ({})
   })
-  data!: {
+  formData!: {
     [key: string]: any
   };
 
@@ -185,19 +186,22 @@ export default class FormEngine extends Vue {
   })
   colOn!: Record<string, () => void>
 
-  @Watch('config')
-  watchConfig() {
-    this.init()
+  @Watch('items')
+  @Watch('rules')
+  watchItemsRules() {
+    this.initFormData()
+    this.handleRules()
   }
 
-  @Watch('data')
-  watchData() {
-    Object.keys(this.data).forEach((key: string) => {
-      this.formData[key] = this.data[key]
+  @Watch('formData')
+  watchFormData() {
+    // 同步最新数据
+    Object.keys(this.formData).forEach((key: string) => {
+      this.$set(this.newFormData, key, this.formData[key])
     })
   }
 
-  formData: {
+  newFormData: {
     [key: string]: any
   } = {};
 
@@ -214,21 +218,21 @@ export default class FormEngine extends Vue {
   }
 
   getComponentName(type: string) {
-    let name = ''
+    let cName = ''
 
     const checkType = (type = '', nowType = '') => type.indexOf(nowType) > -1
 
     if (!type || type === 'input' || type === 'textarea') {
-      name = 'el-input'
+      cName = 'el-input'
     } else if (type === 'select') {
-      name = 'el-select'
+      cName = 'el-select'
     } else if (checkType(type, 'date')) {
-      name = 'el-date-picker'
+      cName = 'el-date-picker'
     } else if (type === 'button') {
-      name = 'el-button'
+      cName = 'el-button'
     }
 
-    return name
+    return cName
   }
 
   getPlaceholder(item: Item) {
@@ -244,59 +248,70 @@ export default class FormEngine extends Vue {
 
   init() {
     this.newRules = this.rules
+    this.newFormData = this.formData
 
-    this.formData = this.data
+    this.initFormData()
+    this.handleRules()
+  }
 
+  initFormData() {
+    // 当不存在值时，设置一个默认值
     this.items.forEach((item: Item) => {
-      if (!this.formData[item.prop] && !item.slot) {
-        this.$set(this.formData, item.prop, '')
+      if (item.prop && !this.formData[item.prop] && !(item.slot || item.formSlot)) {
+        this.$set(this.newFormData, item.prop, '')
       }
+    })
+  }
 
+  handleRules() {
+    this.items.forEach((item: Item) => {
+      let tmpRules: Record<string, unknown>[] = []
+
+      // 当存在required 时，自动添加required验证
       if (item.required) {
         const rules = this.newRules[item.prop] || []
-        let message = ''
-        let trigger = 'blur'
+        const isExist = rules.find((rule: Record<string, unknown>) => rule.required)
 
-        if ((item.type === 'input' || item.type === 'textarea' || !item.type)) {
-          message = `请输入${item.label}`
-        } else {
-          message = `请选择${item.label}`
-          trigger = 'change'
+        if (!isExist) {
+          let message = ''
+          let trigger = 'blur'
+
+          if ((item.type === 'input' || item.type === 'textarea' || !item.type)) {
+            message = `请输入${item.label}`
+          } else if (item.type !== 'button' && item.type !== 'text') {
+            message = `请选择${item.label}`
+            trigger = 'change'
+          }
+
+          const requiredRules = message ? [{
+            required: true,
+            message,
+            trigger
+          }] : []
+
+          tmpRules = [
+            ...requiredRules,
+            ...rules
+          ]
+
+          if (tmpRules) {
+            item.rules = tmpRules
+          }
         }
-
-        const otherRules = message ? [{
-          required: true,
-          message,
-          trigger
-        }] : []
-
-        this.newRules[item.prop] = [
-          ...otherRules,
-          ...rules
-        ]
-      }
-
-      if (item.rules) {
-        item.rules = [
-          ...(Array.isArray(item.rules) ? item.rules : [item.rules]),
-          ...(this.newRules[item.prop] || [])
-        ]
       }
     })
 
-    this.newRules = {
-      ...this.rules,
-      ...this.items
-        .filter((item: any) => item.rules)
-        .reduce(
-          (prev: any, now: any) => ({
-            ...prev,
-            [now.prop]: now.rules
-          }),
-          {}
-        )
-    }
+    this.newRules = merge({}, this.rules, this.items
+      .filter((item: any) => item.rules)
+      .reduce(
+        (prev: any, now: any) => ({
+          ...prev,
+          [now.prop]: now.rules
+        }),
+        {}
+      ))
 
+    // 改动rules，可能会触发表单验证
     this.$nextTick(() => {
       this.clearValidate()
     })
@@ -318,10 +333,10 @@ export default class FormEngine extends Vue {
     [key: string]: any
   }) => void) {
     if (!cb) {
-      return this.$refs.form.validate().then(() => Promise.resolve(this.formData))
+      return this.$refs.form.validate().then(() => Promise.resolve(this.newFormData))
     }
     return this.$refs.form.validate(
-      (isValid, invalidFields) => cb(isValid, invalidFields, this.formData)
+      (isValid, invalidFields) => cb(isValid, invalidFields, this.newFormData)
     )
   }
 }
