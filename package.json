@@ -1,9 +1,11 @@
 {
   "name": "v-form-engine",
   "version": "1.0.1-beta.0",
-  "typings": "types/index.d.ts",
-  "module": "src/index.ts",
   "description": "一个基于 vue + element-ui 的 PC 端表单引擎。支持灵活的配置项、编辑/查看两种视图、自定义模板/插槽、溢出隐藏、双击复制等...",
+  "typings": "types/index.d.ts",
+  "main": "dist/v-form-engine.js",
+  "module": "dist/v-form-engine.esm.js",
+  "unpkg": "dist/v-form-engine.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "node ./build/build.js",
@@ -45,17 +47,25 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xiaofan9/form-engine.git"
+    "url": "git+https://github.com/rare-treasure/form-engine.git"
   },
   "author": "sifan",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/xiaofan9/form-engine/issues"
+    "url": "https://github.com/rare-treasure/form-engine/issues"
   },
-  "homepage": "https://github.com/xiaofan9/form-engine#readme",
+  "homepage": "https://github.com/rare-treasure/form-engine#readme",
   "files": [
     "src",
     "types",
     "dist"
-  ]
+  ],
+  "keywords": [
+    "v-form-engine",
+    "vue-form-engine",
+    "form-engine",
+    "vue",
+    "component",
+    "vue-component"
+  ],
 }
