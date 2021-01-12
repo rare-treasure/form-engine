@@ -9,7 +9,11 @@
     ref="form">
     <el-row v-bind="rowProps" v-on="rowOn">
       <template v-for="(item, idx) of items">
-        <el-col :key="idx" :span="item.span || 12">
+        <el-col
+          :key="idx"
+          v-bind="colProps || item.colProps"
+          v-on="colOn || item.colOn"
+          :span="item.span || 12">
           <el-form-item
             v-if="!item.formSlot"
             :size="size"
@@ -22,7 +26,14 @@
             v-bind="item.props"
             v-on="item.on"
           >
-            <slot v-if="item.slot" :name="item.prop"></slot>
+            <slot
+              v-if="item.slot"
+              :name="item.prop"
+              :item="item"
+              :value="formData[item.prop]"
+              :items="items"
+              :data="formData">
+            </slot>
             <template v-else>
               <component
                 v-bind="item.subProps"
@@ -52,7 +63,16 @@
               </span>
             </template>
           </el-form-item>
-          <slot v-else-if="item.prop" :name="item.prop"></slot>
+          <slot
+            v-else-if="item.prop"
+            :item="item"
+            :value="formData[item.prop]"
+            :rule="newRules[item.prop]"
+            :items="items"
+            :data="formData"
+            :rules="newRules"
+            :name="item.prop">
+          </slot>
         </el-col>
         <el-col
           v-if="item.row && item.span && item.span < 24"
@@ -60,9 +80,9 @@
           :span="24 - item.span">
         </el-col>
       </template>
-      <slot></slot>
+      <slot :items="items" :data="formData" :rules="newRules"></slot>
     </el-row>
-    <slot name="independent"></slot>
+    <slot name="independent" :items="items" :data="formData" :rules="newRules"></slot>
   </el-form>
 </template>
 
@@ -81,8 +101,9 @@ type Item = {
   width: number & string
   prop: string
   formSlot: boolean
+  required: boolean
   slot: boolean
-  rules: Record<string, unknown>
+  rules: Record<string, unknown>[] | Record<string, unknown>
   label: string
   placeholder: string
   size: string
@@ -150,6 +171,20 @@ export default class FormEngine extends Vue {
   })
   rowOn!: Record<string, () => void>
 
+  @Prop({
+    type: Object,
+    default: () => ({})
+  })
+  colProps!: {
+    [key: string]: any
+  };
+
+  @Prop({
+    type: Object,
+    default: () => ({})
+  })
+  colOn!: Record<string, () => void>
+
   @Watch('config')
   watchConfig() {
     this.init()
@@ -166,7 +201,9 @@ export default class FormEngine extends Vue {
     [key: string]: any
   } = {};
 
-  newRules = {};
+  newRules: {
+    [key: string]: any
+  } = {};
 
   $refs!: {
     form: Form
@@ -210,9 +247,40 @@ export default class FormEngine extends Vue {
 
     this.formData = this.data
 
-    this.items.forEach((item: any) => {
+    this.items.forEach((item: Item) => {
       if (!this.formData[item.prop] && !item.slot) {
         this.$set(this.formData, item.prop, '')
+      }
+
+      if (item.required) {
+        const rules = this.newRules[item.prop] || []
+        let message = ''
+        let trigger = 'blur'
+
+        if ((item.type === 'input' || item.type === 'textarea' || !item.type)) {
+          message = `请输入${item.label}`
+        } else {
+          message = `请选择${item.label}`
+          trigger = 'change'
+        }
+
+        const otherRules = message ? [{
+          required: true,
+          message,
+          trigger
+        }] : []
+
+        this.newRules[item.prop] = [
+          ...otherRules,
+          ...rules
+        ]
+      }
+
+      if (item.rules) {
+        item.rules = [
+          ...(Array.isArray(item.rules) ? item.rules : [item.rules]),
+          ...(this.newRules[item.prop] || [])
+        ]
       }
     })
 
