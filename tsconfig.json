@@ -8,6 +8,7 @@
     "moduleResolution": "node",
     "skipLibCheck": true,
     "esModuleInterop": true,
+    "declaration": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "sourceMap": true,
@@ -28,14 +29,8 @@
     ]
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "example/**/*.ts",
-    "example/**/*.tsx",
-    "example/**/*.vue",
-    "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "src/*.ts",
+    "src/*.vue"
   ],
   "exclude": [
     "node_modules"

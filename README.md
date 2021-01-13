@@ -43,12 +43,7 @@ form-engine基于 [vue](https://www.npmjs.com/package/vue) + [element-ui](https:
 暂无
 
 ## 文档
-
-### value
-- Type: String
-- Default: undefined
-
-The value of the QR code.
+编写中
 
 <!-- 
 [💡 使用指南]()

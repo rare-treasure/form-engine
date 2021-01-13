@@ -40,6 +40,7 @@
                 v-on="item.compOn"
                 :size="item.size || size"
                 :placeholder="getPlaceholder(item)"
+                :type="item.type"
                 v-if="getComponentName(item.type)"
                 :is="getComponentName(item.type)"
                 v-model="newFormData[item.prop]"
@@ -57,7 +58,7 @@
               <span
                 v-bind="item.compProps"
                 v-on="item.compOn"
-                v-else-if="item.type === 'text'"
+                v-else
               >
                 {{ newFormData[item.prop] }}
               </span>
@@ -93,7 +94,7 @@ import {
 import {
   FormItem, Button, Input, DatePicker, Select, Form
 } from 'element-ui'
-import { merge } from 'lodash-es'
+import { merge } from 'lodash'
 
 type Item = {
   span: number
@@ -222,11 +223,13 @@ export default class FormEngine extends Vue {
 
     if (!type || type === 'input' || type === 'textarea') {
       cName = 'el-input'
-    } else if (type === 'select') {
-      cName = 'el-select'
+    } else if (type === 'select' || type === 'time-select') {
+      cName = `el-${type}`
+    } else if (type === 'time') {
+      cName = 'el-time-picker'
     } else if (checkType(type, 'date')) {
       cName = 'el-date-picker'
-    } else if (type === 'button') {
+    } else if (type === 'button' || type === 'button-text') {
       cName = 'el-button'
     }
 

@@ -4,5 +4,5 @@ module.exports = {
       modules: false
     }]
   ],
-  plugins: ['@babel/plugin-transform-runtime']
+  plugins: ['@babel/plugin-transform-runtime', 'lodash']
 }

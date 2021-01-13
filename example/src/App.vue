@@ -12,7 +12,8 @@ export default class App extends Vue {
   items = [
     {
       label: 'test1',
-      prop: 'test1'
+      prop: 'test1',
+      type: 'time-select'
     }
   ]
 }

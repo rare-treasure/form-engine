@@ -11,7 +11,7 @@ const cjs = require('@rollup/plugin-commonjs')
 const typescript = require('rollup-plugin-typescript2')
 const pkg = require('../package.json')
 
-const deps = Object.keys(pkg.dependencies)
+const deps = Object.keys(Object.assign({}, pkg.dependencies, pkg.devDependencies))
 const foldPath = path.resolve(__dirname, `..`)
 const input = path.resolve(foldPath, 'src/index.ts')
 const outputConfig = {
@@ -24,9 +24,9 @@ const outputConfig = {
     file: path.resolve(foldPath, `dist/${pkg.name}.js`),
     name: pkg.name,
     globals: {
-      'vue': 'Vue',
-      'element-ui': 'ELEMENT'
-    }
+      'vue': 'Vue'
+    },
+    exports: "named"
   }
 }
 
@@ -38,13 +38,22 @@ const runBuild = async () => {
 
   async function build(name) {
     if (!name) return
-    const extendPlugins = []
+    const extPlugins = name === 'esm' ? [] : [
+      cjs({
+        // 开启混合模式转换
+        transformMixedEsModules: true,
+        sourceMap: false
+      }),
+    ];
 
-    const esmTerser = name === 'esm' ? {
+    const extTerserOpt = name === 'esm' ? {
       compress: {
-        ecma: 2015,
         pure_getters: true
-      }
+      },
+      format: {
+        comments: false,
+      },
+      ecma: 2015,
     } : {}
     const outOptions = outputConfig[name]
     const inputOptions = {
@@ -58,22 +67,22 @@ const runBuild = async () => {
           target: 'browser',
           css: false,
         }),
-        cjs({
-          // 开启混合模式转换
-          transformMixedEsModules: true,
-          sourceMap: false
-        }),
         babel({ 
           babelHelpers: 'runtime', 
           extensions: ['.js', '.jsx', '.mjs', '.ts', '.tsx', '.vue']
         }),
         json(),
-        terser(esmTerser),
-        ...extendPlugins
+        ...extPlugins,
+        terser(
+          Object.assign({
+            mangle: false,
+            toplevel: true,
+            safari10: true
+          }, extTerserOpt)
+        ),
       ],
       external(id) {
-        return name === 'umd' ? /^vue$/.test(id) : (/^vue$/.test(id)
-          || deps.some(k => new RegExp('^' + k).test(id)))
+        return name === 'umd' ? /^vue$/.test(id) : deps.some(k => new RegExp('^' + k).test(id))
       },
     }
 
