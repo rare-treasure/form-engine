@@ -36,8 +36,8 @@
             </slot>
             <template v-else>
               <component
-                v-bind="item.subProps"
-                v-on="item.subOn"
+                v-bind="item.compProps"
+                v-on="item.compOn"
                 :size="item.size || size"
                 :placeholder="getPlaceholder(item)"
                 v-if="getComponentName(item.type)"
@@ -55,8 +55,8 @@
                 </template>
               </component>
               <span
-                v-bind="item.subProps"
-                v-on="item.subOn"
+                v-bind="item.compProps"
+                v-on="item.compOn"
                 v-else-if="item.type === 'text'"
               >
                 {{ newFormData[item.prop] }}
@@ -111,13 +111,11 @@ type Item = {
   type: string
   props: FormItem
   on: Record<string, () => void>
-  subProps: Select | DatePicker | Input | Button
-  subOn: Record<string, () => void>
+  compProps: Select | DatePicker | Input | Button
+  compOn: Record<string, () => void>
 };
 
-@Component({
-  name: 'form-engine'
-})
+@Component
 export default class FormEngine extends Vue {
   @Prop({
     type: Array,
@@ -238,12 +236,12 @@ export default class FormEngine extends Vue {
   getPlaceholder(item: Item) {
     const cName = this.getComponentName(item.type)
     const text = /(input|select)$/.test(cName) ? `请${item.type === 'select' ? '选择' : '输入'}` : ''
-    const subProps = (item?.subProps || {}) as {
+    const compProps = (item?.compProps || {}) as {
       disabled: boolean
       readonly: boolean
     }
 
-    return item.placeholder || (subProps?.disabled || subProps?.readonly || !text ? '' : `${text + item.label}`)
+    return item.placeholder || (compProps?.disabled || compProps?.readonly || !text ? '' : `${text + item.label}`)
   }
 
   init() {
@@ -257,7 +255,7 @@ export default class FormEngine extends Vue {
   initFormData() {
     // 当不存在值时，设置一个默认值
     this.items.forEach((item: Item) => {
-      if (item.prop && !this.formData[item.prop] && !(item.slot || item.formSlot)) {
+      if (item.prop && !this.formData[item.prop]) {
         this.$set(this.newFormData, item.prop, '')
       }
     })

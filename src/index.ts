@@ -3,6 +3,6 @@ import FormEngine from './form-engine.vue'
 
 export default {
   install() {
-    Vue.component(FormEngine.name, FormEngine)
+    Vue.component('form-engine', FormEngine)
   }
 }

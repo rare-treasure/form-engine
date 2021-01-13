@@ -4,7 +4,6 @@
   "description": "一个基于 vue + element-ui 的 PC 端表单引擎。支持灵活的配置项、编辑/查看两种视图、自定义模板/插槽、溢出隐藏、双击复制等...",
   "typings": "types/index.d.ts",
   "main": "dist/v-form-engine.js",
-  "module": "dist/v-form-engine.esm.js",
   "unpkg": "dist/v-form-engine.js",
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -18,7 +17,8 @@
     "core-js": "^3.6.5",
     "element-ui": "^2.13.2",
     "vue": "^2.6.12",
-    "vue-property-decorator": "^9.0.0"
+    "vue-property-decorator": "^9.0.0",
+    "v-form-engine": "~1.0.0"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.12.10",
