@@ -1,6 +1,6 @@
 {
   "name": "v-form-engine",
-  "version": "1.0.1-beta.2",
+  "version": "1.0.1-beta.3",
   "description": "一个基于 vue + element-ui 的 PC 端表单引擎。支持灵活的配置项、编辑/查看两种视图、自定义模板/插槽、溢出隐藏、双击复制等...",
   "typings": "dist/index.d.ts",
   "main": "dist/v-form-engine.js",
@@ -18,7 +18,6 @@
     "core-js": "^3.6.5",
     "element-ui": "^2.13.2",
     "lodash": "^4.17.20",
-    "v-form-engine": "~1.0.0",
     "vue": "^2.6.12",
     "vue-property-decorator": "^9.0.0"
   },
@@ -33,7 +32,6 @@
     "@types/webpack-env": "^1.15.3",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
-    "@vue/babel-preset-app": "^4.5.10",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-plugin-typescript": "~4.5.0",
@@ -44,13 +42,11 @@
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
     "rollup": "^2.36.1",
-    "rollup-plugin-dts": "^2.0.1",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.29.0",
     "rollup-plugin-vue": "^5.1.9",
     "typescript": "~3.9.3",
     "vue-class-component": "^7.2.6",
-    "vue-runtime-helpers": "^1.1.2",
     "vue-template-compiler": "^2.6.11"
   },
   "repository": {

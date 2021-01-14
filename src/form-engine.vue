@@ -44,6 +44,7 @@
                 v-if="getComponentName(item.type)"
                 :is="getComponentName(item.type)"
                 v-model="newFormData[item.prop]"
+                class="form-engine__item"
               >
                 <template v-if="item.type === 'select'">
                   <el-option
@@ -342,3 +343,9 @@ export default class FormEngine extends Vue {
   }
 }
 </script>
+
+<style>
+.form-engine .el-col .form-engine__item {
+  width: 100%
+}
+</style>
