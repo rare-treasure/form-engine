@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import ElementUI from 'element-ui'
+import FormEngine from 'v-form-engine'
 import App from './App.vue'
-import FormEngine from '../packages/form/src'
+
+import 'element-ui/lib/theme-chalk/index.css'
 
 Vue.config.productionTip = false
 
