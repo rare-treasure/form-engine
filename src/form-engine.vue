@@ -115,7 +115,7 @@ type Item = {
   on: Record<string, () => void>
   compProps: Select | DatePicker | Input | Button
   compOn: Record<string, () => void>
-};
+}
 
 @Component
 export default class FormEngine extends Vue {

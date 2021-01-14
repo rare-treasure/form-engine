@@ -1,6 +1,6 @@
 {
   "name": "v-form-engine",
-  "version": "1.0.1-beta.3",
+  "version": "1.0.1",
   "description": "一个基于 vue + element-ui 的 PC 端表单引擎。支持灵活的配置项、编辑/查看两种视图、自定义模板/插槽、溢出隐藏、双击复制等...",
   "typings": "dist/index.d.ts",
   "main": "dist/v-form-engine.js",
@@ -19,7 +19,8 @@
     "element-ui": "^2.13.2",
     "lodash": "^4.17.20",
     "vue": "^2.6.12",
-    "vue-property-decorator": "^9.0.0"
+    "vue-property-decorator": "^9.0.0",
+    "vue-runtime-helpers": "^1.1.2"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.12.10",
