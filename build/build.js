@@ -10,7 +10,6 @@ const { default: babel, getBabelOutputPlugin } = require('@rollup/plugin-babel')
 const cjs = require('@rollup/plugin-commonjs')
 const typescript = require('rollup-plugin-typescript2')
 const pkg = require('../package.json')
-const { DEFAULT_EXTENSIONS } = require('@babel/core');
 
 const deps = Object.keys(Object.assign({}, pkg.dependencies, pkg.devDependencies))
 const foldPath = path.resolve(__dirname, `..`)
@@ -62,12 +61,15 @@ const runBuild = async () => {
       plugins: [
         typescript(),
         nodeResolve({
-          extensions: ['.vue', '.ts', '.tsx'],
+          extensions: ['.mjs', '.js', '.json', '.node', '.vue'],
         }),
-        vue(),
+        vue({
+          target: 'browser',
+          css: false,
+        }),
         babel({ 
           babelHelpers: 'runtime', 
-          extensions: [...DEFAULT_EXTENSIONS, '.ts', '.tsx', '.vue']
+          extensions: ['.js', '.jsx', '.mjs', '.ts', '.tsx', '.vue']
         }),
         json(),
         ...extPlugins,
