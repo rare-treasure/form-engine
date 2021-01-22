@@ -95,7 +95,7 @@ import {
 import {
   FormItem, Button, Input, DatePicker, Select, Form
 } from 'element-ui'
-import { merge } from 'lodash'
+import { isEqual, merge } from 'lodash'
 
 type Item = {
   span: number
@@ -186,19 +186,28 @@ export default class FormEngine extends Vue {
   })
   colOn!: Record<string, () => void>
 
-  @Watch('items')
-  @Watch('rules')
+  @Watch('items', {
+    deep: true
+  })
+  @Watch('rules', {
+    deep: true
+  })
   watchItemsRules() {
     this.initFormData()
     this.handleRules()
   }
 
-  @Watch('formData')
+  @Watch('formData', {
+    deep: true
+  })
   watchFormData() {
     // 同步最新数据
-    Object.keys(this.formData).forEach((key: string) => {
-      this.$set(this.newFormData, key, this.formData[key])
-    })
+    if (isEqual(this.newFormData, this.formData)) {
+      return
+    }
+
+    this.newFormData = this.formData
+    this.initFormData()
   }
 
   newFormData: {
@@ -249,7 +258,6 @@ export default class FormEngine extends Vue {
   }
 
   init() {
-    this.newRules = this.rules
     this.newFormData = this.formData
 
     this.initFormData()
@@ -347,5 +355,10 @@ export default class FormEngine extends Vue {
 <style>
 .form-engine .el-col .form-engine__item {
   width: 100%
+}
+
+.form-engine .el-row {
+  display: flex;
+  flex-wrap: wrap;
 }
 </style>

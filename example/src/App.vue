@@ -13,7 +13,22 @@ export default class App extends Vue {
     {
       label: 'test1',
       prop: 'test1',
-      type: 'time-select'
+      type: 'time-select',
+      row: true,
+      span: 12
+    },
+    {
+      label: 'test2',
+      prop: 'test2',
+      type: 'select',
+      options: [
+        {
+          label: '测试1',
+          value: 1
+        }
+      ],
+      row: true,
+      span: 12
     }
   ]
 }
