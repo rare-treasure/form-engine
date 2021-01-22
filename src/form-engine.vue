@@ -3,7 +3,6 @@
     class="form-engine"
     v-bind="$attrs"
     v-on="$listeners"
-    :size="size"
     :rules="newRules"
     :model="newFormData"
     ref="form">
@@ -16,9 +15,6 @@
           :span="item.span || 12">
           <el-form-item
             v-if="!item.formSlot"
-            :size="size"
-            :label-width="item.labelWidth || labelWidth"
-            :style="{ width: item.width || width || '' + 'px' }"
             :prop="item.prop"
             :label="item.label"
             :rules="item.rules"
@@ -38,7 +34,6 @@
               <component
                 v-bind="item.compProps"
                 v-on="item.compOn"
-                :size="item.size || size"
                 :placeholder="getPlaceholder(item)"
                 :type="item.type"
                 v-if="getComponentName(item.type)"
@@ -100,8 +95,6 @@ import { isEqual, merge } from 'lodash'
 type Item = {
   span: number
   row: number
-  labelWidth: string
-  width: number | string
   prop: string
   formSlot: boolean
   required: boolean
@@ -109,7 +102,6 @@ type Item = {
   rules: Record<string, unknown>[] | Record<string, unknown>
   label: string
   placeholder: string
-  size: string
   type: string
   props: FormItem
   on: Record<string, () => void>
@@ -126,29 +118,12 @@ export default class FormEngine extends Vue {
   items!: Item[];
 
   @Prop({
-    type: String,
-    default: 'small'
-  })
-  size!: string;
-
-  @Prop({
     type: Object,
     default: () => ({})
   })
   rules!: {
     [key: string]: any
   };
-
-  @Prop({
-    type: String,
-    default: '80px'
-  })
-  labelWidth?: string;
-
-  @Prop({
-    type: String
-  })
-  width?: string;
 
   @Prop({
     type: Object,

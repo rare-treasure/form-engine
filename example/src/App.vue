@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <form-engine :items="items" style="width: 600px"></form-engine>
+    <form-engine label-width="80px" size="mini" :items="items" style="width: 600px"></form-engine>
   </div>
 </template>
 
