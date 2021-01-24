@@ -11,8 +11,7 @@
         <el-col
           :key="item.prop"
           v-bind="colProps || item.colProps"
-          v-on="colOn || item.colOn"
-          :span="item.span || 12">
+          v-on="colOn || item.colOn">
           <el-form-item
             v-if="!item.formSlot"
             :prop="item.prop"
