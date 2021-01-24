@@ -61,6 +61,9 @@ export default {
 ```
 
 ### 示例
+
+##### 简单示例
+
 ```javascript
 <template>
   <form-engine :items="items" :form-data="formData" style="width: 600px"></form-engine>
@@ -83,6 +86,10 @@ export default {
 }
 </script>
 ```
+
+##### 在线预览
+
+[预览](https://codepen.io/xiaofan9/pen/dypByGJ)
 
 ### 文档
 简版文档：[请点击这里](https://www.yuque.com/pingfan-mm82t/iqx0qm/form-engine)
