@@ -6,8 +6,13 @@ const install: PluginFunction<never> = () => {
   Vue.component('form-engine', FormEngine)
 }
 
-export default {
-  install
+(FormEngine as typeof FormEngine & { install: PluginFunction<never> }).install = install
+
+/* istanbul ignore if */
+if (typeof window !== 'undefined' && window.Vue) {
+  install(window.Vue)
 }
 
-export { FormEngine }
+export default FormEngine
+
+export { FormEngine, install }

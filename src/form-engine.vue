@@ -7,9 +7,9 @@
     :model="newFormData"
     ref="form">
     <el-row v-bind="rowProps" v-on="rowOn">
-      <template v-for="(item, idx) of items">
+      <template v-for="item of items">
         <el-col
-          :key="idx"
+          :key="item.prop"
           v-bind="colProps || item.colProps"
           v-on="colOn || item.colOn"
           :span="item.span || 12">
@@ -73,7 +73,7 @@
         </el-col>
         <el-col
           v-if="item.row && item.span && item.span < 24"
-          :key="idx"
+          :key="item.prop"
           :span="24 - item.span">
         </el-col>
       </template>

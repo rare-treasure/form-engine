@@ -89,7 +89,7 @@ export default {
 
 ##### 在线预览
 
-[预览](https://codepen.io/xiaofan9/pen/dypByGJ)
+[预览](https://codepen.io/xiaofan9/pen/MWjMWQj)
 
 ### 文档
 简版文档：[请点击这里](https://www.yuque.com/pingfan-mm82t/iqx0qm/form-engine)

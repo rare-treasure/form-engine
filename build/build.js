@@ -11,6 +11,7 @@ const cjs = require("@rollup/plugin-commonjs")
 const typescript = require("rollup-plugin-typescript2")
 const pkg = require("../package.json")
 const { DEFAULT_EXTENSIONS } = require('@babel/core')
+const replace = require('@rollup/plugin-replace')
 
 const deps = Object.keys(Object.assign({}, pkg.dependencies))
 const foldPath = path.resolve(__dirname, `..`)
@@ -23,7 +24,7 @@ const outputConfig = {
   umd: {
     format: "umd",
     file: path.resolve(foldPath, `dist/${pkg.name}.js`),
-    name: pkg.name,
+    name: "FORMENGINE",
     globals: {
       vue: "Vue"
     },
@@ -69,6 +70,10 @@ const runBuild = async () => {
       input,
       plugins: [
         typescript(),
+        replace({
+          'process.env.NODE_ENV': JSON.stringify('development'),
+          'process.env.VUE_ENV': JSON.stringify('browser')
+        }),
         nodeResolve({
           extensions: [".mjs", ".js", ".json", ".node", ...commonExtensions]
         }),

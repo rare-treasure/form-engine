@@ -3,8 +3,6 @@ import { FormItem, Button, Input, DatePicker, Select, Form } from 'element-ui';
 declare type Item = {
     span: number;
     row: number;
-    labelWidth: string;
-    width: number | string;
     prop: string;
     formSlot: boolean;
     required: boolean;
@@ -12,7 +10,6 @@ declare type Item = {
     rules: Record<string, unknown>[] | Record<string, unknown>;
     label: string;
     placeholder: string;
-    size: string;
     type: string;
     props: FormItem;
     on: Record<string, () => void>;
@@ -21,12 +18,9 @@ declare type Item = {
 };
 export default class FormEngine extends Vue {
     items: Item[];
-    size: string;
     rules: {
         [key: string]: any;
     };
-    labelWidth?: string;
-    width?: string;
     formData: {
         [key: string]: any;
     };
