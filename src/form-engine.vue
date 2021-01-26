@@ -11,7 +11,8 @@
         <el-col
           :key="item.prop"
           v-bind="colProps || item.colProps"
-          v-on="colOn || item.colOn">
+          v-on="colOn || item.colOn"
+          :span="item.span">
           <el-form-item
             v-if="!item.formSlot"
             :prop="item.prop"
@@ -63,7 +64,7 @@
             v-else-if="item.prop"
             :item="item"
             :value="newFormData[item.prop]"
-            :rule="newRules[item.prop]"
+            :rule="item.rules"
             :items="items"
             :form-data="newFormData"
             :rules="newRules"
@@ -230,7 +231,7 @@ export default class FormEngine extends Vue {
       readonly: boolean
     }
 
-    return item.placeholder || (compProps?.disabled || compProps?.readonly || !text ? '' : `${text + item.label}`)
+    return item.placeholder || ((compProps?.disabled || compProps?.readonly || !text) ? '' : `${text + item.label}`)
   }
 
   init() {

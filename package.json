@@ -1,6 +1,6 @@
 {
   "name": "v-form-engine",
-  "version": "1.0.6",
+  "version": "1.0.7.beta-0",
   "description": "一个基于 vue + element-ui 的 PC 端表单引擎。支持灵活的配置项、编辑/查看两种视图、自定义模板/插槽、溢出隐藏、双击复制等...",
   "typings": "dist/index.d.ts",
   "main": "dist/v-form-engine.js",
@@ -63,9 +63,13 @@
   "homepage": "https://github.com/rare-treasure/form-engine#readme",
   "files": [
     "src",
-    "types",
-    "dist"
+    "dist",
+    "vetur"
   ],
+  "vetur": {
+    "tags": "vetur/tags.json",
+    "attributes": "vetur/attributes.json"
+  },
   "keywords": [
     "v-form-engine",
     "vue-form-engine",

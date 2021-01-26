@@ -9341,6 +9341,18 @@ uuid@^3.3.2, uuid@^3.4.0:
   resolved "https://registry.npm.taobao.org/uuid/download/uuid-3.4.0.tgz?cache=0&sync_timestamp=1607460081656&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fuuid%2Fdownload%2Fuuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
   integrity sha1-sj5DWK+oogL+ehAK8fX4g/AgB+4=
 
+v-form-engine@~1.0.6:
+  version "1.0.6"
+  resolved "https://registry.npm.taobao.org/v-form-engine/download/v-form-engine-1.0.6.tgz?cache=0&sync_timestamp=1611647674555&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fv-form-engine%2Fdownload%2Fv-form-engine-1.0.6.tgz#8203471ce942801a0b28de1d25fddf9cfed99282"
+  integrity sha1-ggNHHOlCgBoLKN4dJf3fnP7ZkoI=
+  dependencies:
+    core-js "^3.6.5"
+    element-ui "^2.13.2"
+    lodash "^4.17.20"
+    vue "^2.6.12"
+    vue-property-decorator "^9.0.0"
+    vue-runtime-helpers "^1.1.2"
+
 v8-compile-cache@^2.0.3:
   version "2.2.0"
   resolved "https://registry.npm.taobao.org/v8-compile-cache/download/v8-compile-cache-2.2.0.tgz#9471efa3ef9128d2f7c6a7ca39c4dd6b5055b132"
