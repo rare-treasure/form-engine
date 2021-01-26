@@ -1,6 +1,12 @@
 <template>
   <div id="app">
-    <form-engine label-width="80px" size="mini" :items="items" style="width: 600px"></form-engine>
+    <form-engine
+      label-width="80px"
+      size="mini"
+      :items="items"
+      style="width: 600px"
+      :rules="rules"
+    ></form-engine>
   </div>
 </template>
 
@@ -13,7 +19,7 @@ export default class App extends Vue {
     {
       label: 'test1',
       prop: 'test1',
-      type: 'time-select',
+      // type: 'time-select',
       row: true,
       span: 12
     },
@@ -31,6 +37,15 @@ export default class App extends Vue {
       span: 12
     }
   ]
+
+  rules = {
+    test1: [{
+      validator(rule: any, value: any, callback: Function) {
+        callback(new Error('请输入正确数字'))
+      },
+      trigger: 'blur'
+    }]
+  }
 }
 </script>
 

@@ -87,7 +87,7 @@ import {
   Component, Vue, Watch, Prop
 } from 'vue-property-decorator'
 import {
-  FormItem, Button, Input, DatePicker, Select, Form
+  FormItem, Button, Input, DatePicker, Select, Form, Col, Row
 } from 'element-ui'
 import { isEqual, merge } from 'lodash'
 
@@ -102,10 +102,16 @@ type Item = {
   label: string
   placeholder: string
   type: string
+  options: {
+    label?: string
+    value: string | number
+  }[]
   props: FormItem
-  on: Record<string, () => void>
+  on: Record<string, () => void> | HTMLElementEventMap
+  colProps: Col
+  colOn: Record<string, () => void> | HTMLElementEventMap
   compProps: Select | DatePicker | Input | Button
-  compOn: Record<string, () => void>
+  compOn: Record<string, () => void> | HTMLElementEventMap
 }
 
 @Component
@@ -136,29 +142,25 @@ export default class FormEngine extends Vue {
     type: Object,
     default: () => ({})
   })
-  rowProps!: {
-    [key: string]: any
-  };
+  rowProps!: Row;
 
   @Prop({
     type: Object,
     default: () => ({})
   })
-  rowOn!: Record<string, () => void>
+  rowOn!: Record<string, () => void> | HTMLElementEventMap
 
   @Prop({
     type: Object,
     default: () => ({})
   })
-  colProps!: {
-    [key: string]: any
-  };
+  colProps!: Col;
 
   @Prop({
     type: Object,
     default: () => ({})
   })
-  colOn!: Record<string, () => void>
+  colOn!: Record<string, () => void> | HTMLElementEventMap
 
   @Watch('items', {
     deep: true
@@ -233,6 +235,7 @@ export default class FormEngine extends Vue {
 
   init() {
     this.newFormData = this.formData
+    this.newRules = this.rules
 
     this.initFormData()
     this.handleRules()

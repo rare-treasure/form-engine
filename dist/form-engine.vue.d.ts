@@ -1,5 +1,5 @@
 import { Vue } from 'vue-property-decorator';
-import { FormItem, Button, Input, DatePicker, Select, Form } from 'element-ui';
+import { FormItem, Button, Input, DatePicker, Select, Form, Col, Row } from 'element-ui';
 declare type Item = {
     span: number;
     row: number;
@@ -11,10 +11,16 @@ declare type Item = {
     label: string;
     placeholder: string;
     type: string;
+    options: {
+        label?: string;
+        value: string | number;
+    }[];
     props: FormItem;
-    on: Record<string, () => void>;
+    on: Record<string, () => void> | HTMLElementEventMap;
+    colProps: Col;
+    colOn: Record<string, () => void> | HTMLElementEventMap;
     compProps: Select | DatePicker | Input | Button;
-    compOn: Record<string, () => void>;
+    compOn: Record<string, () => void> | HTMLElementEventMap;
 };
 export default class FormEngine extends Vue {
     items: Item[];
@@ -24,14 +30,10 @@ export default class FormEngine extends Vue {
     formData: {
         [key: string]: any;
     };
-    rowProps: {
-        [key: string]: any;
-    };
-    rowOn: Record<string, () => void>;
-    colProps: {
-        [key: string]: any;
-    };
-    colOn: Record<string, () => void>;
+    rowProps: Row;
+    rowOn: Record<string, () => void> | HTMLElementEventMap;
+    colProps: Col;
+    colOn: Record<string, () => void> | HTMLElementEventMap;
     watchItemsRules(): void;
     watchFormData(): void;
     newFormData: {
