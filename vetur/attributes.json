@@ -1,7 +1,30 @@
 {
-  "form-engine": {
-    "attributes": ["items", "rules", "form-data", "row-props", "row-on", "col-props", "col-on"],
-    "defaults": ["items"],
-    "description": "form-engine, A PC form engine based on Vue + element UI. Support flexible configuration items, edit / view two views, custom template / slot, overflow hide, double-click copy, etc."
+  "items": {
+    "type": "array",
+    "description": "form item configuration, [details](https://www.yuque.com/pingfan-mm82t/iqx0qm/form-engine#oh5aD), defaults: []"
+  },
+  "rules": {
+    "type": "object",
+    "description": "validation rules of form, default: {}"
+  },
+  "form-data": {
+    "type": "object",
+    "description": "data of form component, default: {}"
+  },
+  "row-props": {
+    "type": "object",
+    "description": "el-row [attributes](https://element.eleme.cn/#/zh-CN/component/layout) object"
+  },
+  "row-on": {
+    "type": "object",
+    "description": "el-row [native events](https://www.w3school.com.cn/jsref/dom_obj_event.asp) object"
+  },
+  "col-props": {
+    "type": "object",
+    "description": "el-col [attributes](https://element.eleme.cn/#/zh-CN/component/layout) object"
+  },
+  "col-on": {
+    "type": "object",
+    "description": "el-col [native events](https://www.w3school.com.cn/jsref/dom_obj_event.asp) object"
   }
 }
