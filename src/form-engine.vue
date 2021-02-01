@@ -88,7 +88,7 @@ import {
   Component, Vue, Watch, Prop
 } from 'vue-property-decorator'
 import {
-  FormItem, Button, Input, DatePicker, Select, Form, Col, Row
+  Form, FormItem, Row, Col
 } from 'element-ui'
 import { isEqual, merge } from 'lodash'
 import { ValidateCallback, ValidateFieldCallback } from 'element-ui/types/form.d'
@@ -112,7 +112,7 @@ type Item = {
   on: Record<string, () => void> | HTMLElementEventMap
   colProps: Col
   colOn: Record<string, () => void> | HTMLElementEventMap
-  compProps: Select | DatePicker | Input | Button
+  compProps: Record<string, any>
   compOn: Record<string, () => void> | HTMLElementEventMap
 }
 
@@ -213,14 +213,12 @@ export default class FormEngine extends Vue {
 
     if (!type || type === 'input' || type === 'textarea') {
       cName = 'el-input'
-    } else if (type === 'select' || type === 'time-select') {
-      cName = `el-${type}`
     } else if (type === 'time') {
       cName = 'el-time-picker'
     } else if (checkType(type, 'date')) {
       cName = 'el-date-picker'
-    } else if (type === 'button' || type === 'button-text') {
-      cName = 'el-button'
+    } else if (type && type !== 'text') {
+      cName = `el-${type}`
     }
 
     return cName
