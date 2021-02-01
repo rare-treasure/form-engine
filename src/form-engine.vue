@@ -91,6 +91,7 @@ import {
   FormItem, Button, Input, DatePicker, Select, Form, Col, Row
 } from 'element-ui'
 import { isEqual, merge } from 'lodash'
+import { ValidateCallback, ValidateFieldCallback } from 'element-ui/types/form.d'
 
 type Item = {
   span: number
@@ -115,6 +116,10 @@ type Item = {
   compOn: Record<string, () => void> | HTMLElementEventMap
 }
 
+type FormData = {
+  [key: string]: any
+}
+
 @Component
 export default class FormEngine extends Vue {
   @Prop({
@@ -135,9 +140,7 @@ export default class FormEngine extends Vue {
     type: Object,
     default: () => ({})
   })
-  formData!: {
-    [key: string]: any
-  };
+  formData!: FormData;
 
   @Prop({
     type: Object,
@@ -305,7 +308,7 @@ export default class FormEngine extends Vue {
     })
   }
 
-  clearValidate(props: string[] | string = '') {
+  clearValidate(props?: string[] | string) {
     if (this.$refs?.form) this.$refs.form.clearValidate(props)
   }
 
@@ -313,19 +316,24 @@ export default class FormEngine extends Vue {
     if (this.$refs?.form) this.$refs.form.resetFields()
   }
 
-  validateField(props: string[] | string, cb: (errorMessage: string) => void) {
+  validateField(props: string[] | string, cb?: ValidateFieldCallback) {
     if (this.$refs?.form) this.$refs.form.validateField(props, cb)
   }
 
-  validate(cb: (isValid: boolean, invalidFields: object, data: {
-    [key: string]: any
-  }) => void) {
+  validate(cb?: ValidateCallback) {
+    let promise: Promise<FormData> = new Promise((resolve) => {
+      resolve(this.newFormData)
+    })
+
     if (!cb) {
-      return this.$refs.form.validate().then(() => Promise.resolve(this.newFormData))
+      promise = this.$refs.form.validate().then(() => Promise.resolve(this.newFormData))
+    } else {
+      this.$refs.form.validate(
+        (isValid, invalidFields) => cb(isValid, invalidFields)
+      )
     }
-    return this.$refs.form.validate(
-      (isValid, invalidFields) => cb(isValid, invalidFields, this.newFormData)
-    )
+
+    return promise
   }
 }
 </script>
