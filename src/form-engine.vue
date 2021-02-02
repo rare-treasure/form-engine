@@ -94,10 +94,12 @@ import { cloneDeep, isEqual, merge } from 'lodash'
 import { ValidateCallback, ValidateFieldCallback } from 'element-ui/types/form.d'
 
 type Rule = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any
 }
 
 type FormData = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any
 }
 
@@ -120,6 +122,7 @@ type Item = {
   on: Record<string, () => void> | HTMLElementEventMap
   colProps: Col
   colOn: Record<string, () => void> | HTMLElementEventMap
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   compProps: Record<string, any>
   compOn: Record<string, () => void> | HTMLElementEventMap
 }
@@ -279,10 +282,14 @@ export default class FormEngine extends Vue {
           let message = ''
           let trigger = 'blur'
 
-          if ((tmpItem.type === 'input' || tmpItem.type === 'textarea' || !tmpItem.type)) {
+          if ((/(input|select|autocomplete)$/.test(tmpItem.type) || !tmpItem.type)) {
             message = `请输入${tmpItem.label}`
           } else if (tmpItem.type !== 'button' && tmpItem.type !== 'text') {
             message = `请选择${tmpItem.label}`
+            trigger = 'change'
+          }
+
+          if (tmpItem.type === 'autocomplete') {
             trigger = 'change'
           }
 
@@ -296,9 +303,9 @@ export default class FormEngine extends Vue {
 
       tmpRules = [
         ...requiredRules,
-        ...rules,
         // eslint-disable-next-line no-nested-ternary
-        ...(Array.isArray(tmpItem.rules) ? tmpItem.rules : (tmpItem.rules ? [tmpItem.rules] : []))
+        ...(Array.isArray(tmpItem.rules) ? tmpItem.rules : (tmpItem.rules ? [tmpItem.rules] : [])),
+        ...rules
       ]
 
       if (tmpRules.length) {
@@ -312,6 +319,7 @@ export default class FormEngine extends Vue {
       .filter((item: Item) => item.rules)
       .reduce(
         (prev: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           [key: string]: any
         }, now: Item) => ({
           ...prev,
