@@ -169,12 +169,18 @@ export default class FormEngine extends Vue {
   @Watch('items', {
     deep: true
   })
+  watchItems() {
+    // 在原有数据中, 进行新增rules, data的数据;
+    this.handleFormData()
+    this.handleRules()
+  }
+
   @Watch('rules', {
     deep: true
   })
-  watchItemsRules() {
-    this.initFormData()
-    this.handleRules()
+  watchRules() {
+    // 依据最新数据直接重置rules
+    this.handleRules(true)
   }
 
   @Watch('formData', {
@@ -186,8 +192,7 @@ export default class FormEngine extends Vue {
       return
     }
 
-    this.newFormData = this.formData
-    this.initFormData()
+    this.handleFormData(true)
   }
 
   newFormData: {
@@ -226,7 +231,7 @@ export default class FormEngine extends Vue {
 
   getPlaceholder(item: Item) {
     const cName = this.getComponentName(item.type)
-    const text = /(input|select)$/.test(cName) ? `请${item.type === 'select' ? '选择' : '输入'}` : ''
+    const text = /(input|select|autocomplete)$/.test(cName) ? `请${item.type === 'select' ? '选择' : '输入'}` : ''
     const compProps = (item?.compProps || {}) as {
       disabled: boolean
       readonly: boolean
@@ -236,14 +241,15 @@ export default class FormEngine extends Vue {
   }
 
   init() {
-    this.newFormData = this.formData
-    this.newRules = this.rules
-
-    this.initFormData()
-    this.handleRules()
+    this.handleFormData(true)
+    this.handleRules(true)
   }
 
-  initFormData() {
+  handleFormData(isInit?: boolean) {
+    if (isInit) {
+      this.newFormData = this.formData
+    }
+
     // 当不存在值时，设置一个默认值
     this.items.forEach((item: Item) => {
       if (item.prop && !this.formData[item.prop]) {
@@ -252,13 +258,19 @@ export default class FormEngine extends Vue {
     })
   }
 
-  handleRules() {
+  handleRules(isInit?: boolean) {
+    if (isInit) {
+      this.newRules = this.rules
+    }
+
     this.items.forEach((item: Item) => {
       let tmpRules: Record<string, unknown>[] = []
+      let requiredRules: Record<string, unknown>[] = []
+
+      const rules = this.newRules[item.prop] || []
 
       // 当存在required 时，自动添加required验证
       if (item.required) {
-        const rules = this.newRules[item.prop] || []
         const isExist = rules.find((rule: Record<string, unknown>) => rule.required)
 
         if (!isExist) {
@@ -272,21 +284,23 @@ export default class FormEngine extends Vue {
             trigger = 'change'
           }
 
-          const requiredRules = message ? [{
+          requiredRules = message ? [{
             required: true,
             message,
             trigger
           }] : []
-
-          tmpRules = [
-            ...requiredRules,
-            ...rules
-          ]
-
-          if (tmpRules) {
-            item.rules = tmpRules
-          }
         }
+      }
+
+      tmpRules = [
+        ...requiredRules,
+        ...rules,
+        // eslint-disable-next-line no-nested-ternary
+        ...(Array.isArray(item.rules) ? item.rules : (item.rules ? [item.rules] : []))
+      ]
+
+      if (tmpRules.length) {
+        item.rules = tmpRules
       }
     })
 
