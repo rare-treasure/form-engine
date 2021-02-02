@@ -7,7 +7,7 @@
     :model="newFormData"
     ref="form">
     <el-row v-bind="rowProps" v-on="rowOn">
-      <template v-for="item of items">
+      <template v-for="item of newItems">
         <el-col
           :key="item.prop"
           v-bind="colProps || item.colProps"
@@ -27,7 +27,7 @@
               :name="item.prop"
               :item="item"
               :value="newFormData[item.prop]"
-              :items="items"
+              :items="newItems"
               :form-data="newFormData">
             </slot>
             <template v-else>
@@ -65,7 +65,7 @@
             :item="item"
             :value="newFormData[item.prop]"
             :rule="item.rules"
-            :items="items"
+            :items="newItems"
             :form-data="newFormData"
             :rules="newRules"
             :name="item.prop">
@@ -77,9 +77,9 @@
           :span="24 - item.span">
         </el-col>
       </template>
-      <slot :items="items" :form-data="newFormData" :rules="newRules"></slot>
+      <slot :items="newItems" :form-data="newFormData" :rules="newRules"></slot>
     </el-row>
-    <slot name="independent" :items="items" :form-data="newFormData" :rules="newRules"></slot>
+    <slot name="independent" :items="newItems" :form-data="newFormData" :rules="newRules"></slot>
   </el-form>
 </template>
 
@@ -90,8 +90,16 @@ import {
 import {
   Form, FormItem, Row, Col
 } from 'element-ui'
-import { isEqual, merge } from 'lodash'
+import { cloneDeep, isEqual, merge } from 'lodash'
 import { ValidateCallback, ValidateFieldCallback } from 'element-ui/types/form.d'
+
+type Rule = {
+  [key: string]: any
+}
+
+type FormData = {
+  [key: string]: any
+}
 
 type Item = {
   span: number
@@ -100,7 +108,7 @@ type Item = {
   formSlot: boolean
   required: boolean
   slot: boolean
-  rules: Record<string, unknown>[] | Record<string, unknown>
+  rules: Rule | Rule[]
   label: string
   placeholder: string
   type: string
@@ -116,10 +124,6 @@ type Item = {
   compOn: Record<string, () => void> | HTMLElementEventMap
 }
 
-type FormData = {
-  [key: string]: any
-}
-
 @Component
 export default class FormEngine extends Vue {
   @Prop({
@@ -132,9 +136,7 @@ export default class FormEngine extends Vue {
     type: Object,
     default: () => ({})
   })
-  rules!: {
-    [key: string]: any
-  };
+  rules!: Rule;
 
   @Prop({
     type: Object,
@@ -195,13 +197,11 @@ export default class FormEngine extends Vue {
     this.handleFormData(true)
   }
 
-  newFormData: {
-    [key: string]: any
-  } = {};
+  newFormData: FormData = {};
 
-  newRules: {
-    [key: string]: any
-  } = {};
+  newRules: Rule = {};
+
+  newItems: Item[] = [];
 
   $refs!: {
     form: Form
@@ -262,25 +262,27 @@ export default class FormEngine extends Vue {
     if (isInit) {
       this.newRules = this.rules
     }
+    const items: Item[] = []
 
     this.items.forEach((item: Item) => {
-      let tmpRules: Record<string, unknown>[] = []
-      let requiredRules: Record<string, unknown>[] = []
+      let tmpRules: Rule[] = []
+      let requiredRules: Rule[] = []
+      const tmpItem = cloneDeep(item)
 
-      const rules = this.newRules[item.prop] || []
+      const rules: Rule[] = this.newRules[tmpItem.prop] || []
 
       // 当存在required 时，自动添加required验证
-      if (item.required) {
-        const isExist = rules.find((rule: Record<string, unknown>) => rule.required)
+      if (tmpItem.required) {
+        const isExist = rules.find((rule: Rule) => rule.required)
 
         if (!isExist) {
           let message = ''
           let trigger = 'blur'
 
-          if ((item.type === 'input' || item.type === 'textarea' || !item.type)) {
-            message = `请输入${item.label}`
-          } else if (item.type !== 'button' && item.type !== 'text') {
-            message = `请选择${item.label}`
+          if ((tmpItem.type === 'input' || tmpItem.type === 'textarea' || !tmpItem.type)) {
+            message = `请输入${tmpItem.label}`
+          } else if (tmpItem.type !== 'button' && tmpItem.type !== 'text') {
+            message = `请选择${tmpItem.label}`
             trigger = 'change'
           }
 
@@ -296,23 +298,29 @@ export default class FormEngine extends Vue {
         ...requiredRules,
         ...rules,
         // eslint-disable-next-line no-nested-ternary
-        ...(Array.isArray(item.rules) ? item.rules : (item.rules ? [item.rules] : []))
+        ...(Array.isArray(tmpItem.rules) ? tmpItem.rules : (tmpItem.rules ? [tmpItem.rules] : []))
       ]
 
       if (tmpRules.length) {
-        item.rules = tmpRules
+        tmpItem.rules = tmpRules
       }
+
+      items.push(tmpItem)
     })
 
-    this.newRules = merge({}, this.rules, this.items
-      .filter((item: any) => item.rules)
+    this.newRules = merge({}, this.rules, items
+      .filter((item: Item) => item.rules)
       .reduce(
-        (prev: any, now: any) => ({
+        (prev: {
+          [key: string]: any
+        }, now: Item) => ({
           ...prev,
           [now.prop]: now.rules
         }),
         {}
-      ))
+      ) as Rule)
+
+    this.newItems = items
 
     // 改动rules，可能会触发表单验证
     this.$nextTick(() => {
