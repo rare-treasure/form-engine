@@ -16,7 +16,7 @@ form-engine基于 [vue](https://www.npmjs.com/package/vue) + [element-ui](https:
 
   tip：目前仅第一点功能实现，后续功能迭代中…
 
-  * [ ] v1.1 基于已有功能，进行底层升级，以支撑已经到来的vue 3.0，同时兼具功能与性能
+  * [ ] v2.0 基于已有功能，进行底层升级，以支撑已经到来的vue 3.0，同时兼具功能与性能
 
 ### 安装 && 引入
 
