@@ -1,5 +1,12 @@
 import { Vue } from 'vue-property-decorator';
-import { FormItem, Button, Input, DatePicker, Select, Form, Col, Row } from 'element-ui';
+import { Form, FormItem, Row, Col } from 'element-ui';
+import { ValidateCallback, ValidateFieldCallback } from 'element-ui/types/form.d';
+declare type Rule = {
+    [key: string]: any;
+};
+declare type FormData = {
+    [key: string]: any;
+};
 declare type Item = {
     span: number;
     row: number;
@@ -7,7 +14,7 @@ declare type Item = {
     formSlot: boolean;
     required: boolean;
     slot: boolean;
-    rules: Record<string, unknown>[] | Record<string, unknown>;
+    rules: Rule | Rule[];
     label: string;
     placeholder: string;
     type: string;
@@ -19,29 +26,23 @@ declare type Item = {
     on: Record<string, () => void> | HTMLElementEventMap;
     colProps: Col;
     colOn: Record<string, () => void> | HTMLElementEventMap;
-    compProps: Select | DatePicker | Input | Button;
+    compProps: Record<string, any>;
     compOn: Record<string, () => void> | HTMLElementEventMap;
 };
 export default class FormEngine extends Vue {
     items: Item[];
-    rules: {
-        [key: string]: any;
-    };
-    formData: {
-        [key: string]: any;
-    };
+    rules: Rule;
+    formData: FormData;
     rowProps: Row;
     rowOn: Record<string, () => void> | HTMLElementEventMap;
     colProps: Col;
     colOn: Record<string, () => void> | HTMLElementEventMap;
-    watchItemsRules(): void;
+    watchItems(): void;
+    watchRules(): void;
     watchFormData(): void;
-    newFormData: {
-        [key: string]: any;
-    };
-    newRules: {
-        [key: string]: any;
-    };
+    newFormData: FormData;
+    newRules: Rule;
+    newItems: Item[];
     $refs: {
         form: Form;
     };
@@ -49,15 +50,11 @@ export default class FormEngine extends Vue {
     getComponentName(type: string): string;
     getPlaceholder(item: Item): string;
     init(): void;
-    initFormData(): void;
-    handleRules(): void;
+    handleFormData(isInit?: boolean): void;
+    handleRules(isInit?: boolean): void;
     clearValidate(props?: string[] | string): void;
     resetFields(): void;
-    validateField(props: string[] | string, cb: (errorMessage: string) => void): void;
-    validate(cb: (isValid: boolean, invalidFields: object, data: {
-        [key: string]: any;
-    }) => void): void | Promise<{
-        [key: string]: any;
-    }>;
+    validateField(props: string[] | string, cb?: ValidateFieldCallback): void;
+    validate(cb?: ValidateCallback): Promise<FormData>;
 }
 export {};

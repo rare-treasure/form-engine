@@ -5,14 +5,16 @@
     v-on="$listeners"
     :rules="newRules"
     :model="newFormData"
-    ref="form">
+    ref="form"
+  >
     <el-row v-bind="rowProps" v-on="rowOn">
       <template v-for="item of newItems">
         <el-col
           :key="item.prop"
           v-bind="colProps || item.colProps"
           v-on="colOn || item.colOn"
-          :span="item.span">
+          :span="item.span"
+        >
           <el-form-item
             v-if="!item.formSlot"
             :prop="item.prop"
@@ -28,7 +30,8 @@
               :item="item"
               :value="newFormData[item.prop]"
               :items="newItems"
-              :form-data="newFormData">
+              :form-data="newFormData"
+            >
             </slot>
             <template v-else>
               <component
@@ -51,11 +54,7 @@
                   ></el-option>
                 </template>
               </component>
-              <span
-                v-bind="item.compProps"
-                v-on="item.compOn"
-                v-else
-              >
+              <span v-bind="item.compProps" v-on="item.compOn" v-else>
                 {{ newFormData[item.prop] }}
               </span>
             </template>
@@ -68,13 +67,15 @@
             :items="newItems"
             :form-data="newFormData"
             :rules="newRules"
-            :name="item.prop">
+            :name="item.prop"
+          >
           </slot>
         </el-col>
         <el-col
           v-if="item.row && item.span && item.span < 24"
           :key="item.prop"
-          :span="24 - item.span">
+          :span="24 - item.span"
+        >
         </el-col>
       </template>
       <slot :items="newItems" :form-data="newFormData" :rules="newRules"></slot>
@@ -85,119 +86,119 @@
 
 <script lang="ts">
 import {
-  Component, Vue, Watch, Prop
-} from 'vue-property-decorator'
+  Component, Vue, Watch, Prop,
+} from 'vue-property-decorator';
 import {
-  Form, FormItem, Row, Col
-} from 'element-ui'
-import { cloneDeep, isEqual, merge } from 'lodash'
-import { ValidateCallback, ValidateFieldCallback } from 'element-ui/types/form.d'
+  Form, FormItem, Row, Col,
+} from 'element-ui';
+import { cloneDeep, isEqual, merge } from 'lodash';
+import { ValidateCallback, ValidateFieldCallback } from 'element-ui/types/form.d';
 
 type Rule = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any
-}
+  [key: string]: any;
+};
 
 type FormData = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any
-}
+  [key: string]: any;
+};
 
 type Item = {
-  span: number
-  row: number
-  prop: string
-  formSlot: boolean
-  required: boolean
-  slot: boolean
-  rules: Rule | Rule[]
-  label: string
-  placeholder: string
-  type: string
+  span: number;
+  row: number;
+  prop: string;
+  formSlot: boolean;
+  required: boolean;
+  slot: boolean;
+  rules: Rule | Rule[];
+  label: string;
+  placeholder: string;
+  type: string;
   options: {
-    label?: string
-    value: string | number
-  }[]
-  props: FormItem
-  on: Record<string, () => void> | HTMLElementEventMap
-  colProps: Col
-  colOn: Record<string, () => void> | HTMLElementEventMap
+    label?: string;
+    value: string | number;
+  }[];
+  props: FormItem;
+  on: Record<string, () => void> | HTMLElementEventMap;
+  colProps: Col;
+  colOn: Record<string, () => void> | HTMLElementEventMap;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  compProps: Record<string, any>
-  compOn: Record<string, () => void> | HTMLElementEventMap
-}
+  compProps: Record<string, any>;
+  compOn: Record<string, () => void> | HTMLElementEventMap;
+};
 
 @Component
 export default class FormEngine extends Vue {
   @Prop({
     type: Array,
-    default: () => []
+    default: () => [],
   })
   items!: Item[];
 
   @Prop({
     type: Object,
-    default: () => ({})
+    default: () => ({}),
   })
   rules!: Rule;
 
   @Prop({
     type: Object,
-    default: () => ({})
+    default: () => ({}),
   })
   formData!: FormData;
 
   @Prop({
     type: Object,
-    default: () => ({})
+    default: () => ({}),
   })
   rowProps!: Row;
 
   @Prop({
     type: Object,
-    default: () => ({})
+    default: () => ({}),
   })
-  rowOn!: Record<string, () => void> | HTMLElementEventMap
+  rowOn!: Record<string, () => void> | HTMLElementEventMap;
 
   @Prop({
     type: Object,
-    default: () => ({})
+    default: () => ({}),
   })
   colProps!: Col;
 
   @Prop({
     type: Object,
-    default: () => ({})
+    default: () => ({}),
   })
-  colOn!: Record<string, () => void> | HTMLElementEventMap
+  colOn!: Record<string, () => void> | HTMLElementEventMap;
 
   @Watch('items', {
-    deep: true
+    deep: true,
   })
   watchItems() {
     // 在原有数据中, 进行新增rules, data的数据;
-    this.handleFormData()
-    this.handleRules()
+    this.handleFormData();
+    this.handleRules();
   }
 
   @Watch('rules', {
-    deep: true
+    deep: true,
   })
   watchRules() {
     // 依据最新数据直接重置rules
-    this.handleRules(true)
+    this.handleRules(true);
   }
 
   @Watch('formData', {
-    deep: true
+    deep: true,
   })
   watchFormData() {
     // 同步最新数据
     if (isEqual(this.newFormData, this.formData)) {
-      return
+      return;
     }
 
-    this.handleFormData(true)
+    this.handleFormData(true);
   }
 
   newFormData: FormData = {};
@@ -207,168 +208,184 @@ export default class FormEngine extends Vue {
   newItems: Item[] = [];
 
   $refs!: {
-    form: Form
+    form: Form;
   };
 
   created() {
-    this.init()
+    this.init();
   }
 
+  // eslint-disable-next-line class-methods-use-this
   getComponentName(type: string) {
-    let cName = ''
+    let cName = '';
 
-    const checkType = (type = '', nowType = '') => type.indexOf(nowType) > -1
+    // eslint-disable-next-line no-shadow
+    const checkType = (type = '', nowType = '') => type.indexOf(nowType) > -1;
 
     if (!type || type === 'input' || type === 'textarea') {
-      cName = 'el-input'
+      cName = 'el-input';
     } else if (type === 'time') {
-      cName = 'el-time-picker'
+      cName = 'el-time-picker';
     } else if (checkType(type, 'date')) {
-      cName = 'el-date-picker'
+      cName = 'el-date-picker';
     } else if (type && type !== 'text') {
-      cName = `el-${type}`
+      cName = `el-${type}`;
     }
 
-    return cName
+    return cName;
   }
 
   getPlaceholder(item: Item) {
-    const cName = this.getComponentName(item.type)
-    const text = /(input|select|autocomplete)$/.test(cName) ? `请${item.type === 'select' ? '选择' : '输入'}` : ''
+    const cName = this.getComponentName(item.type);
+    const text = /(input|select|autocomplete)$/.test(cName)
+      ? `请${item.type === 'select' ? '选择' : '输入'}`
+      : '';
     const compProps = (item?.compProps || {}) as {
-      disabled: boolean
-      readonly: boolean
-    }
+      disabled: boolean;
+      readonly: boolean;
+    };
 
-    return item.placeholder || ((compProps?.disabled || compProps?.readonly || !text) ? '' : `${text + item.label}`)
+    return (
+      item.placeholder
+      || (compProps?.disabled || compProps?.readonly || !text ? '' : `${text + item.label}`)
+    );
   }
 
   init() {
-    this.handleFormData(true)
-    this.handleRules(true)
+    this.handleFormData(true);
+    this.handleRules(true);
   }
 
   handleFormData(isInit?: boolean) {
     if (isInit) {
-      this.newFormData = this.formData
+      this.newFormData = this.formData;
     }
 
     // 当不存在值时，设置一个默认值
     this.items.forEach((item: Item) => {
       if (item.prop && !this.formData[item.prop]) {
-        this.$set(this.newFormData, item.prop, '')
+        this.$set(this.newFormData, item.prop, '');
       }
-    })
+    });
   }
 
   handleRules(isInit?: boolean) {
     if (isInit) {
-      this.newRules = this.rules
+      this.newRules = this.rules;
     }
-    const items: Item[] = []
+    const items: Item[] = [];
 
     this.items.forEach((item: Item) => {
-      let tmpRules: Rule[] = []
-      let requiredRules: Rule[] = []
-      const tmpItem = cloneDeep(item)
+      let tmpRules: Rule[] = [];
+      let requiredRules: Rule[] = [];
+      const tmpItem = cloneDeep(item);
 
-      const rules: Rule[] = this.newRules[tmpItem.prop] || []
+      const rules: Rule[] = this.newRules[tmpItem.prop] || [];
 
       // 当存在required 时，自动添加required验证
       if (tmpItem.required) {
-        const isExist = rules.find((rule: Rule) => rule.required)
+        const isExist = rules.find((rule: Rule) => rule.required);
 
         if (!isExist) {
-          let message = ''
-          let trigger = 'blur'
+          let message = '';
+          let trigger = 'blur';
 
-          if ((/(input|select|autocomplete)$/.test(tmpItem.type) || !tmpItem.type)) {
-            message = `请输入${tmpItem.label}`
+          if (/(input|select|autocomplete)$/.test(tmpItem.type) || !tmpItem.type) {
+            message = `请输入${tmpItem.label}`;
           } else if (tmpItem.type !== 'button' && tmpItem.type !== 'text') {
-            message = `请选择${tmpItem.label}`
-            trigger = 'change'
+            message = `请选择${tmpItem.label}`;
+            trigger = 'change';
           }
 
           if (tmpItem.type === 'autocomplete') {
-            trigger = 'change'
+            trigger = 'change';
           }
 
-          requiredRules = message ? [{
-            required: true,
-            message,
-            trigger
-          }] : []
+          requiredRules = message
+            ? [
+              {
+                required: true,
+                message,
+                trigger,
+              },
+            ]
+            : [];
         }
       }
 
       tmpRules = [
         ...requiredRules,
         // eslint-disable-next-line no-nested-ternary
-        ...(Array.isArray(tmpItem.rules) ? tmpItem.rules : (tmpItem.rules ? [tmpItem.rules] : [])),
-        ...rules
-      ]
+        ...(Array.isArray(tmpItem.rules) ? tmpItem.rules : tmpItem.rules ? [tmpItem.rules] : []),
+        ...rules,
+      ];
 
       if (tmpRules.length) {
-        tmpItem.rules = tmpRules
+        tmpItem.rules = tmpRules;
       }
 
-      items.push(tmpItem)
-    })
+      items.push(tmpItem);
+    });
 
-    this.newRules = merge({}, this.rules, items
-      .filter((item: Item) => item.rules)
-      .reduce(
-        (prev: {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          [key: string]: any
-        }, now: Item) => ({
-          ...prev,
-          [now.prop]: now.rules
-        }),
-        {}
-      ) as Rule)
+    this.newRules = merge(
+      {},
+      this.rules,
+      items
+        .filter((item: Item) => item.rules)
+        .reduce(
+          (
+            prev: {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              [key: string]: any;
+            },
+            now: Item,
+          ) => ({
+            ...prev,
+            [now.prop]: now.rules,
+          }),
+          {},
+        ) as Rule,
+    );
 
-    this.newItems = items
+    this.newItems = items;
 
     // 改动rules，可能会触发表单验证
     this.$nextTick(() => {
-      this.clearValidate()
-    })
+      this.clearValidate();
+    });
   }
 
   clearValidate(props?: string[] | string) {
-    if (this.$refs?.form) this.$refs.form.clearValidate(props)
+    if (this.$refs?.form) this.$refs.form.clearValidate(props);
   }
 
   resetFields() {
-    if (this.$refs?.form) this.$refs.form.resetFields()
+    if (this.$refs?.form) this.$refs.form.resetFields();
   }
 
   validateField(props: string[] | string, cb?: ValidateFieldCallback) {
-    if (this.$refs?.form) this.$refs.form.validateField(props, cb)
+    if (this.$refs?.form) this.$refs.form.validateField(props, cb);
   }
 
   validate(cb?: ValidateCallback) {
     let promise: Promise<FormData> = new Promise((resolve) => {
-      resolve(this.newFormData)
-    })
+      resolve(this.newFormData);
+    });
 
     if (!cb) {
-      promise = this.$refs.form.validate().then(() => Promise.resolve(this.newFormData))
+      promise = this.$refs.form.validate().then(() => Promise.resolve(this.newFormData));
     } else {
-      this.$refs.form.validate(
-        (isValid, invalidFields) => cb(isValid, invalidFields)
-      )
+      this.$refs.form.validate((isValid, invalidFields) => cb(isValid, invalidFields));
     }
 
-    return promise
+    return promise;
   }
 }
 </script>
 
 <style>
 .form-engine .el-col .form-engine__item {
-  width: 100%
+  width: 100%;
 }
 
 .form-engine .el-row {

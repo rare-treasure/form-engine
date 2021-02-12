@@ -71,8 +71,7 @@ const runBuild = async () => {
       plugins: [
         typescript(),
         replace({
-          'process.env.NODE_ENV': JSON.stringify('development'),
-          'process.env.VUE_ENV': JSON.stringify('browser')
+          'process.env.NODE_ENV': JSON.stringify('production')
         }),
         nodeResolve({
           extensions: [".mjs", ".js", ".json", ".node", ...commonExtensions]
