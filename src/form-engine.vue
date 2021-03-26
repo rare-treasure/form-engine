@@ -13,7 +13,7 @@
           :key="item.prop"
           v-bind="colProps || item.colProps"
           v-on="colOn || item.colOn"
-          :span="item.span"
+          :span="item.span || span"
         >
           <el-form-item
             v-if="!item.formSlot"
@@ -73,7 +73,7 @@
         </el-col>
         <el-col
           v-if="item.row && item.span && item.span < 24"
-          :key="item.prop"
+          :key="item.prop + '__row'"
           :span="24 - item.span"
         >
         </el-col>
@@ -135,6 +135,12 @@ export default class FormEngine extends Vue {
     default: () => [],
   })
   items!: Item[];
+
+  @Prop({
+    type: Number,
+    default: 24,
+  })
+  span!: number;
 
   @Prop({
     type: Object,
@@ -247,7 +253,9 @@ export default class FormEngine extends Vue {
 
     return (
       item.placeholder
-      || (compProps?.disabled || compProps?.readonly || !text ? '' : `${text + item.label}`)
+      || (this.$attrs.disabled || compProps?.disabled || compProps?.readonly || !text
+        ? ''
+        : `${text + item.label}`)
     );
   }
 
