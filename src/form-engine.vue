@@ -6,6 +6,7 @@
     :rules="newRules"
     :model="newFormData"
     ref="form"
+    :validate-on-rule-change="getAttrValue($attrs, 'validate-on-rule-change', isChangeValidateRule)"
   >
     <el-row v-bind="rowProps" v-on="rowOn">
       <template v-for="item of newItems">
@@ -43,6 +44,9 @@
                 :is="getComponentName(item.type)"
                 v-model="newFormData[item.prop]"
                 class="form-engine__item"
+                :clearable="getAttrValue(item.compProps, 'clearable', item.clearable)"
+                :disabled="getAttrValue(item.compProps, 'disabled', item.disabled)"
+                :readonly="getAttrValue(item.compProps, 'readonly', item.readonly)"
               >
                 <template v-if="item.type === 'select'">
                   <el-option
@@ -91,7 +95,9 @@ import {
 import {
   Form, FormItem, Row, Col,
 } from 'element-ui';
-import { cloneDeep, isEqual, merge } from 'lodash';
+import {
+  camelCase, cloneDeep, isEqual, merge,
+} from 'lodash';
 import { ValidateCallback, ValidateFieldCallback } from 'element-ui/types/form.d';
 
 type Rule = {
@@ -119,6 +125,8 @@ type Item = {
     label?: string;
     value: string | number;
   }[];
+  readonly: boolean;
+  disabled: boolean;
   props: FormItem;
   on: Record<string, () => void> | HTMLElementEventMap;
   colProps: Col;
@@ -217,8 +225,15 @@ export default class FormEngine extends Vue {
     form: Form;
   };
 
+  isChangeValidateRule = false;
+
   created() {
     this.init();
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  getAttrValue(dataSource: any = {}, key: string, defalutValue: any) {
+    return dataSource?.[key] ?? dataSource?.[camelCase(key)] ?? defalutValue;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -252,8 +267,14 @@ export default class FormEngine extends Vue {
     };
 
     return (
-      item.placeholder
-      || (this.$attrs.disabled || compProps?.disabled || compProps?.readonly || !text
+      (item.compProps || {}).placeholder
+      || item.placeholder
+      || (this.$attrs.disabled
+      || item.disabled
+      || item.readonly
+      || compProps?.disabled
+      || compProps?.readonly
+      || !text
         ? ''
         : `${text + item.label}`)
     );
@@ -278,6 +299,7 @@ export default class FormEngine extends Vue {
   }
 
   handleRules(isInit?: boolean) {
+    this.isChangeValidateRule = false;
     if (isInit) {
       this.newRules = this.rules;
     }
@@ -359,7 +381,11 @@ export default class FormEngine extends Vue {
 
     // 改动rules，可能会触发表单验证
     this.$nextTick(() => {
-      this.clearValidate();
+      if (this.isChangeValidateRule) {
+        this.clearValidate();
+      }
+
+      this.isChangeValidateRule = true;
     });
   }
 
