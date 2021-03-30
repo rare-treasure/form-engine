@@ -11,6 +11,14 @@
     "type": "number",
     "description": "el-col span value, default: 24"
   },
+  "clearable": {
+    "type": "boolean",
+    "description": "set all the components in the el-form to the empty option, default: false"
+  },
+  "disabled": {
+    "type": "boolean",
+    "description": "disable all components within the el-form, default: false"
+  },
   "form-data": {
     "type": "object",
     "description": "data of form component, default: {}"

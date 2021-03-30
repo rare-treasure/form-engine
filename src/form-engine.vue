@@ -7,6 +7,7 @@
     :model="newFormData"
     ref="form"
     :validate-on-rule-change="getAttrValue($attrs, 'validate-on-rule-change', isChangeValidateRule)"
+    :disabled="disabled"
   >
     <el-row v-bind="rowProps" v-on="rowOn">
       <template v-for="item of newItems">
@@ -44,8 +45,8 @@
                 :is="getComponentName(item.type)"
                 v-model="newFormData[item.prop]"
                 class="form-engine__item"
-                :clearable="getAttrValue(item.compProps, 'clearable', item.clearable)"
-                :disabled="getAttrValue(item.compProps, 'disabled', item.disabled)"
+                :clearable="getAttrValue(item.compProps, 'clearable', item.clearable || clearable)"
+                :disabled="getAttrValue(item.compProps, 'disabled', item.disabled || disabled)"
                 :readonly="getAttrValue(item.compProps, 'readonly', item.readonly)"
               >
                 <template v-if="item.type === 'select'">
@@ -55,6 +56,7 @@
                     :disabled="subItem.disabled"
                     :value="subItem.value"
                     :label="subItem.label"
+                    v-bind="subItem"
                   ></el-option>
                 </template>
               </component>
@@ -76,9 +78,11 @@
           </slot>
         </el-col>
         <el-col
-          v-if="item.row && item.span && item.span < 24"
+          v-if="
+            item.row && (item.span || span) && (item.span || span) < 24 && (item.span || span) > 0
+          "
           :key="item.prop + '__row'"
-          :span="24 - item.span"
+          :span="24 - (item.span || span)"
         >
         </el-col>
       </template>
@@ -125,6 +129,7 @@ export type Item = {
     label?: string;
     value: string | number;
   }[];
+  clearable: boolean;
   readonly: boolean;
   disabled: boolean;
   notEditHidePlaceholder: boolean;
@@ -198,6 +203,12 @@ export default class FormEngine extends Vue {
     default: () => ({}),
   })
   colOn!: On;
+
+  @Prop(Boolean)
+  disabled!: boolean;
+
+  @Prop(Boolean)
+  clearable!: boolean;
 
   @Watch('items', {
     deep: true,
@@ -281,19 +292,17 @@ export default class FormEngine extends Vue {
     const hidePlaceholder = item.notEditHidePlaceholder || this.notEditHidePlaceholder;
 
     // eslint-disable-next-line no-shadow
-    const getText = (text: string) => (this.$attrs.disabled
+    const getText = (text: string) => (this.disabled
       || item.disabled
       || item.readonly
       || compProps?.disabled
-      || compProps?.readonly ? '' : text);
+      || compProps?.readonly
+      ? ''
+      : text);
 
-    const placeholder = (item.compProps || {}).placeholder
-      || item.placeholder;
+    const placeholder = (item.compProps || {}).placeholder || item.placeholder;
 
-    return (
-      hidePlaceholder ? getText(placeholder)
-        : (placeholder || getText(text + item.label))
-    );
+    return hidePlaceholder ? getText(placeholder) : placeholder || getText(text + item.label);
   }
 
   init() {
