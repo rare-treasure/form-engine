@@ -22,6 +22,7 @@ export declare type Item = {
         label?: string;
         value: string | number;
     }[];
+    clearable: boolean;
     readonly: boolean;
     disabled: boolean;
     notEditHidePlaceholder: boolean;
@@ -45,6 +46,8 @@ export default class FormEngine extends Vue {
     rowOn: On;
     colProps: ColProps;
     colOn: On;
+    disabled: boolean;
+    clearable: boolean;
     watchItems(): void;
     watchRules(): void;
     watchFormData(): void;
