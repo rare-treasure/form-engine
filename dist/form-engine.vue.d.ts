@@ -1,13 +1,13 @@
 import { Vue } from 'vue-property-decorator';
 import { Form, FormItem, Row, Col } from 'element-ui';
 import { ValidateCallback, ValidateFieldCallback } from 'element-ui/types/form.d';
-declare type Rule = {
+export declare type Rule = {
     [key: string]: any;
 };
-declare type FormData = {
+export declare type FormData = {
     [key: string]: any;
 };
-declare type Item = {
+export declare type Item = {
     span: number;
     row: number;
     prop: string;
@@ -22,6 +22,9 @@ declare type Item = {
         label?: string;
         value: string | number;
     }[];
+    readonly: boolean;
+    disabled: boolean;
+    notEditHidePlaceholder: boolean;
     props: FormItem;
     on: Record<string, () => void> | HTMLElementEventMap;
     colProps: Col;
@@ -29,14 +32,19 @@ declare type Item = {
     compProps: Record<string, any>;
     compOn: Record<string, () => void> | HTMLElementEventMap;
 };
+export declare type RowProps = Row;
+export declare type ColProps = Col;
+export declare type On = Record<string, () => void> | HTMLElementEventMap;
 export default class FormEngine extends Vue {
     items: Item[];
+    span: number;
+    notEditHidePlaceholder: boolean;
     rules: Rule;
     formData: FormData;
-    rowProps: Row;
-    rowOn: Record<string, () => void> | HTMLElementEventMap;
-    colProps: Col;
-    colOn: Record<string, () => void> | HTMLElementEventMap;
+    rowProps: RowProps;
+    rowOn: On;
+    colProps: ColProps;
+    colOn: On;
     watchItems(): void;
     watchRules(): void;
     watchFormData(): void;
@@ -46,9 +54,11 @@ export default class FormEngine extends Vue {
     $refs: {
         form: Form;
     };
+    isChangeValidateRule: boolean;
     created(): void;
+    getAttrValue(dataSource: any, key: string, defalutValue: any): any;
     getComponentName(type: string): string;
-    getPlaceholder(item: Item): string;
+    getPlaceholder(item: Item): any;
     init(): void;
     handleFormData(isInit?: boolean): void;
     handleRules(isInit?: boolean): void;
@@ -57,4 +67,3 @@ export default class FormEngine extends Vue {
     validateField(props: string[] | string, cb?: ValidateFieldCallback): void;
     validate(cb?: ValidateCallback): Promise<FormData>;
 }
-export {};

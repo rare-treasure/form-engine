@@ -100,17 +100,17 @@ import {
 } from 'lodash';
 import { ValidateCallback, ValidateFieldCallback } from 'element-ui/types/form.d';
 
-type Rule = {
+export type Rule = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 };
 
-type FormData = {
+export type FormData = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 };
 
-type Item = {
+export type Item = {
   span: number;
   row: number;
   prop: string;
@@ -127,6 +127,7 @@ type Item = {
   }[];
   readonly: boolean;
   disabled: boolean;
+  notEditHidePlaceholder: boolean;
   props: FormItem;
   on: Record<string, () => void> | HTMLElementEventMap;
   colProps: Col;
@@ -135,6 +136,12 @@ type Item = {
   compProps: Record<string, any>;
   compOn: Record<string, () => void> | HTMLElementEventMap;
 };
+
+export type RowProps = Row;
+
+export type ColProps = Col;
+
+export type On = Record<string, () => void> | HTMLElementEventMap;
 
 @Component
 export default class FormEngine extends Vue {
@@ -149,6 +156,12 @@ export default class FormEngine extends Vue {
     default: 24,
   })
   span!: number;
+
+  @Prop({
+    type: Boolean,
+    default: true,
+  })
+  notEditHidePlaceholder!: boolean;
 
   @Prop({
     type: Object,
@@ -166,25 +179,25 @@ export default class FormEngine extends Vue {
     type: Object,
     default: () => ({}),
   })
-  rowProps!: Row;
+  rowProps!: RowProps;
 
   @Prop({
     type: Object,
     default: () => ({}),
   })
-  rowOn!: Record<string, () => void> | HTMLElementEventMap;
+  rowOn!: On;
 
   @Prop({
     type: Object,
     default: () => ({}),
   })
-  colProps!: Col;
+  colProps!: ColProps;
 
   @Prop({
     type: Object,
     default: () => ({}),
   })
-  colOn!: Record<string, () => void> | HTMLElementEventMap;
+  colOn!: On;
 
   @Watch('items', {
     deep: true,
@@ -265,18 +278,21 @@ export default class FormEngine extends Vue {
       disabled: boolean;
       readonly: boolean;
     };
+    const hidePlaceholder = item.notEditHidePlaceholder || this.notEditHidePlaceholder;
 
-    return (
-      (item.compProps || {}).placeholder
-      || item.placeholder
-      || (this.$attrs.disabled
+    // eslint-disable-next-line no-shadow
+    const getText = (text: string) => (this.$attrs.disabled
       || item.disabled
       || item.readonly
       || compProps?.disabled
-      || compProps?.readonly
-      || !text
-        ? ''
-        : `${text + item.label}`)
+      || compProps?.readonly ? '' : text);
+
+    const placeholder = (item.compProps || {}).placeholder
+      || item.placeholder;
+
+    return (
+      hidePlaceholder ? getText(placeholder)
+        : (placeholder || getText(text + item.label))
     );
   }
 
