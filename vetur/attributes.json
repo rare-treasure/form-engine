@@ -38,5 +38,9 @@
   "col-on": {
     "type": "object",
     "description": "el-col [native events](https://www.w3school.com.cn/jsref/dom_obj_event.asp) object"
+  },
+  "not-edit-hide-placeholder": {
+    "type": "boolean",
+    "description": "whether to hide the placeholder when the component cannot be edited, default: false"
   }
 }

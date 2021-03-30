@@ -164,7 +164,7 @@ export default class FormEngine extends Vue {
 
   @Prop({
     type: Boolean,
-    default: true,
+    default: false,
   })
   notEditHidePlaceholder!: boolean;
 
@@ -302,7 +302,7 @@ export default class FormEngine extends Vue {
 
     const placeholder = (item.compProps || {}).placeholder || item.placeholder;
 
-    return hidePlaceholder ? getText(placeholder) : placeholder || getText(text + item.label);
+    return (hidePlaceholder ? getText(placeholder) : placeholder) || getText(text + item.label);
   }
 
   init() {
