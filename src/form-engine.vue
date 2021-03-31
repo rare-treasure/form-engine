@@ -317,7 +317,12 @@ export default class FormEngine extends Vue {
 
     // 当不存在值时，设置一个默认值
     this.items.forEach((item: Item) => {
-      if (item.prop && !this.formData[item.prop]) {
+      if (
+        item.prop
+        && !this.formData[item.prop]
+        && this.formData[item.prop] !== 0
+        && this.formData[item.prop] !== false
+      ) {
         this.$set(this.newFormData, item.prop, '');
       }
     });
