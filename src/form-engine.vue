@@ -120,6 +120,7 @@ export type Item = {
   prop: string;
   formSlot: boolean;
   required: boolean;
+  requiredErrMsg: string;
   slot: boolean;
   rules: Rule | Rule[];
   label: string;
@@ -350,11 +351,15 @@ export default class FormEngine extends Vue {
           let message = '';
           let trigger = 'blur';
 
-          if (/(input|select|autocomplete)$/.test(tmpItem.type) || !tmpItem.type) {
+          if (/(input|autocomplete|input-number)$/.test(tmpItem.type) || !tmpItem.type) {
             message = `请输入${tmpItem.label}`;
           } else if (tmpItem.type !== 'button' && tmpItem.type !== 'text') {
             message = `请选择${tmpItem.label}`;
             trigger = 'change';
+          }
+
+          if (tmpItem.requiredErrMsg) {
+            message = tmpItem.requiredErrMsg;
           }
 
           if (tmpItem.type === 'autocomplete') {
