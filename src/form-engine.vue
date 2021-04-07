@@ -351,7 +351,7 @@ export default class FormEngine extends Vue {
           let message = '';
           let trigger = 'blur';
 
-          if (/(input|autocomplete|input-number)$/.test(tmpItem.type) || !tmpItem.type) {
+          if (/(input|autocomplete|input-number|textarea)$/.test(tmpItem.type) || !tmpItem.type) {
             message = `请输入${tmpItem.label}`;
           } else if (tmpItem.type !== 'button' && tmpItem.type !== 'text') {
             message = `请选择${tmpItem.label}`;
