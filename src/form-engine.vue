@@ -10,7 +10,7 @@
     :disabled="disabled"
   >
     <el-row v-bind="rowProps" v-on="rowOn">
-      <template v-for="item of newItems">
+      <template v-for="(item, idx) of newItems">
         <el-col
           :key="item.prop"
           v-bind="colProps || item.colProps"
@@ -74,6 +74,7 @@
             :form-data="newFormData"
             :rules="newRules"
             :name="item.prop"
+            :validate="(cb) => validateField(item.prop, cb)"
           >
           </slot>
         </el-col>
@@ -84,6 +85,12 @@
           :key="item.prop + '__row'"
           :span="24 - (item.span || span)"
         >
+        </el-col>
+        <el-col 
+          v-if="
+            item.linefeed && (item.span || span) && (item.span || span) < 24 && (item.span || span) > 0
+          " :key="item.prop + 'linefeed'"
+          :span="getLinefeedSpan(idx)">
         </el-col>
       </template>
       <slot :items="newItems" :form-data="newFormData" :rules="newRules"></slot>
@@ -141,6 +148,7 @@ export type Item = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   compProps: Record<string, any>;
   compOn: Record<string, () => void> | HTMLElementEventMap;
+  linefeed: Boolean
 };
 
 export type RowProps = Row;
@@ -304,6 +312,26 @@ export default class FormEngine extends Vue {
     const placeholder = (item.compProps || {}).placeholder || item.placeholder;
 
     return (hidePlaceholder ? getText(placeholder) : placeholder) || getText(text + item.label);
+  }
+
+  getLinefeedSpan(idx: number) {
+    const newItems = cloneDeep(this.newItems ?? []);
+    let rowIdx = 0;
+
+    for (let i = 0; i <= idx; i++) {
+      if(newItems?.[i]?.row) {
+        rowIdx = i;
+      }
+    }
+    const list = cloneDeep(newItems?.splice(rowIdx, idx - rowIdx + 1) ?? []);
+
+    const span = list.reduce((total: number, nowItems: Item) => {
+      return total + (nowItems?.span || 24)
+    }, 0);
+
+    console.log(24 - span % 24)
+
+    return 24 - span % 24;
   }
 
   init() {

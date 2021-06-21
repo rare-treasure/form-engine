@@ -13,6 +13,7 @@ export declare type Item = {
     prop: string;
     formSlot: boolean;
     required: boolean;
+    requiredErrMsg: string;
     slot: boolean;
     rules: Rule | Rule[];
     label: string;
@@ -62,6 +63,7 @@ export default class FormEngine extends Vue {
     getAttrValue(dataSource: any, key: string, defalutValue: any): any;
     getComponentName(type: string): string;
     getPlaceholder(item: Item): any;
+    getLinefeedSpan(idx: number): number;
     init(): void;
     handleFormData(isInit?: boolean): void;
     handleRules(isInit?: boolean): void;
