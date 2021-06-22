@@ -27,19 +27,11 @@
     "type": "object",
     "description": "el-row [attributes](https://element.eleme.cn/#/zh-CN/component/layout) object"
   },
-  "row-on": {
-    "type": "object",
-    "description": "el-row [native events](https://www.w3school.com.cn/jsref/dom_obj_event.asp) object"
-  },
   "col-props": {
     "type": "object",
     "description": "el-col [attributes](https://element.eleme.cn/#/zh-CN/component/layout) object"
   },
-  "col-on": {
-    "type": "object",
-    "description": "el-col [native events](https://www.w3school.com.cn/jsref/dom_obj_event.asp) object"
-  },
-  "not-edit-hide-placeholder": {
+  "is-edit-hide-placeholder": {
     "type": "boolean",
     "description": "whether to hide the placeholder when the component cannot be edited, default: false"
   }

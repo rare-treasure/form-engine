@@ -1,30 +1,31 @@
 <template>
   <el-form
+    ref="form"
     class="form-engine"
     v-bind="$attrs"
     v-on="$listeners"
     :rules="newRules"
     :model="newFormData"
-    ref="form"
     :validate-on-rule-change="getAttrValue($attrs, 'validate-on-rule-change', isChangeValidateRule)"
     :disabled="disabled"
   >
-    <el-row v-bind="rowProps" v-on="rowOn">
-      <template v-for="item of newItems">
+    <el-row
+      v-bind="getAttrValue($attrs, 'row-props', rowProps)"
+    >
+      <template v-for="(item, idx) of newItems">
         <el-col
           :key="item.prop"
-          v-bind="colProps || item.colProps"
-          v-on="colOn || item.colOn"
           :span="item.span || span"
+          v-bind="getAttrValue(item, 'col-props', getAttrValue(this, 'col-props', {}))"
         >
           <el-form-item
             v-if="!item.formSlot"
             :prop="item.prop"
             :label="item.label"
             :rules="item.rules"
-            :ref="(item.props || {}).ref || item.prop"
-            v-bind="item.props"
-            v-on="item.on"
+            :ref="item.ref || item.prop"
+            v-bind="getAttrValue(item, 'form-item-props', {})"
+            v-on="getAttrValue(item, 'form-item-on', {})"
           >
             <slot
               v-if="item.slot"
@@ -37,30 +38,32 @@
             </slot>
             <template v-else>
               <component
-                v-bind="item.compProps"
-                v-on="item.compOn"
-                :placeholder="getPlaceholder(item)"
-                :type="item.type"
+                class="form-engine__item"
+                v-bind="getAttrValue(item, 'component-props', {})"
+                v-on="getAttrValue(item, 'component-on', {})"
+                v-model="newFormData[item.prop]"
                 v-if="getComponentName(item.type)"
                 :is="getComponentName(item.type)"
-                v-model="newFormData[item.prop]"
-                class="form-engine__item"
-                :clearable="getAttrValue(item.compProps, 'clearable', item.clearable || clearable)"
-                :disabled="getAttrValue(item.compProps, 'disabled', item.disabled || disabled)"
-                :readonly="getAttrValue(item.compProps, 'readonly', item.readonly)"
+                :placeholder="getPlaceholder(item)"
+                :type="item.type"
+                :clearable="item.clearable || clearable"
+                :disabled="item.disabled || disabled"
+                :readonly="item.readonly"
               >
                 <template v-if="item.type === 'select'">
                   <el-option
                     v-for="(subItem, idx) of item.options || []"
+                    :ref="item.ref"
                     :key="idx"
                     :disabled="subItem.disabled"
                     :value="subItem.value"
                     :label="subItem.label"
-                    v-bind="subItem"
                   ></el-option>
                 </template>
               </component>
-              <span v-bind="item.compProps" v-on="item.compOn" v-else>
+              <span
+                v-bind="getAttrValue(item, 'comp-props', {})"
+                v-on="getAttrValue(item, 'comp-on', {})" v-else>
                 {{ newFormData[item.prop] }}
               </span>
             </template>
@@ -74,6 +77,7 @@
             :form-data="newFormData"
             :rules="newRules"
             :name="item.prop"
+            :validate="(cb) => validateField(item.prop, cb)"
           >
           </slot>
         </el-col>
@@ -85,6 +89,15 @@
           :span="24 - (item.span || span)"
         >
         </el-col>
+        <el-col
+          v-if="
+            item.linefeed
+            && (item.span || span)
+            && (item.span || span) < 24
+            && (item.span || span) > 0
+          " :key="item.prop + 'linefeed'"
+          :span="getLinefeedSpan(idx)">
+        </el-col>
       </template>
       <slot :items="newItems" :form-data="newFormData" :rules="newRules"></slot>
     </el-row>
@@ -93,6 +106,7 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Component, Vue, Watch, Prop,
 } from 'vue-property-decorator';
@@ -105,49 +119,46 @@ import {
 import { ValidateCallback, ValidateFieldCallback } from 'element-ui/types/form.d';
 
 export type Rule = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 };
 
 export type FormData = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 };
 
 export type Item = {
-  span: number;
-  row: number;
-  prop: string;
-  formSlot: boolean;
-  required: boolean;
-  requiredErrMsg: string;
-  slot: boolean;
-  rules: Rule | Rule[];
-  label: string;
-  placeholder: string;
   type: string;
-  options: {
-    label?: string;
-    value: string | number;
-  }[];
+  label: string;
+  prop: string;
+  span: number;
+  placeholder: string;
+  slot: boolean;
+  formSlot: boolean;
   clearable: boolean;
   readonly: boolean;
   disabled: boolean;
-  notEditHidePlaceholder: boolean;
+  row: boolean;
+  linefeed: boolean;
+  rules: Rule | Rule[];
   props: FormItem;
-  on: Record<string, () => void> | HTMLElementEventMap;
+  required: boolean;
+  requiredErrMsg: string;
+  isHideEditPlaceholder: boolean;
+  options: {
+    label?: string;
+    value: string | number;
+    disabled?: boolean;
+  }[];
   colProps: Col;
-  colOn: Record<string, () => void> | HTMLElementEventMap;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  compProps: Record<string, any>;
-  compOn: Record<string, () => void> | HTMLElementEventMap;
+  formItemProps: Record<string, () => void>;
+  formItemOn: Record<string, () => void>;
+  componentProps: Record<string, any>;
+  componentOn: Record<string, () => void>;
 };
 
 export type RowProps = Row;
 
 export type ColProps = Col;
-
-export type On = Record<string, () => void> | HTMLElementEventMap;
 
 @Component
 export default class FormEngine extends Vue {
@@ -165,9 +176,9 @@ export default class FormEngine extends Vue {
 
   @Prop({
     type: Boolean,
-    default: false,
+    default: true,
   })
-  notEditHidePlaceholder!: boolean;
+  isHideEditPlaceholder!: boolean;
 
   @Prop({
     type: Object,
@@ -191,19 +202,7 @@ export default class FormEngine extends Vue {
     type: Object,
     default: () => ({}),
   })
-  rowOn!: On;
-
-  @Prop({
-    type: Object,
-    default: () => ({}),
-  })
   colProps!: ColProps;
-
-  @Prop({
-    type: Object,
-    default: () => ({}),
-  })
-  colOn!: On;
 
   @Prop(Boolean)
   disabled!: boolean;
@@ -258,6 +257,7 @@ export default class FormEngine extends Vue {
 
   // eslint-disable-next-line class-methods-use-this
   getAttrValue(dataSource: any = {}, key: string, defalutValue: any) {
+    console.log(dataSource?.[key] ?? dataSource?.[camelCase(key)] ?? defalutValue);
     return dataSource?.[key] ?? dataSource?.[camelCase(key)] ?? defalutValue;
   }
 
@@ -286,24 +286,38 @@ export default class FormEngine extends Vue {
     const text = /(input|select|autocomplete)$/.test(cName)
       ? `请${item.type === 'select' ? '选择' : '输入'}`
       : '';
-    const compProps = (item?.compProps || {}) as {
-      disabled: boolean;
-      readonly: boolean;
-    };
-    const hidePlaceholder = item.notEditHidePlaceholder || this.notEditHidePlaceholder;
+    const cProps = item?.componentProps;
+    const isHideEditPlaceholder = item.isHideEditPlaceholder || this.isHideEditPlaceholder;
 
     // eslint-disable-next-line no-shadow
     const getText = (text: string) => (this.disabled
       || item.disabled
       || item.readonly
-      || compProps?.disabled
-      || compProps?.readonly
+      || cProps?.disabled
+      || cProps?.readonly
       ? ''
       : text);
 
-    const placeholder = (item.compProps || {}).placeholder || item.placeholder;
+    const placeholder = (item.componentProps || {}).placeholder || item.placeholder;
 
-    return (hidePlaceholder ? getText(placeholder) : placeholder) || getText(text + item.label);
+    return (isHideEditPlaceholder ? getText(placeholder) : placeholder)
+      || getText(text + item.label);
+  }
+
+  getLinefeedSpan(idx: number) {
+    const newItems = cloneDeep(this.newItems ?? []);
+    let rowIdx = 0;
+
+    for (let i = 0; i <= idx; i += 1) {
+      if (newItems?.[i]?.row) {
+        rowIdx = i;
+      }
+    }
+    const list = cloneDeep(newItems?.splice(rowIdx, idx - rowIdx + 1) ?? []);
+
+    const span = list.reduce((total: number, nowItems: Item) => total + (nowItems?.span || 24), 0);
+
+    return 24 - (span % 24);
   }
 
   init() {
@@ -400,7 +414,6 @@ export default class FormEngine extends Vue {
         .reduce(
           (
             prev: {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               [key: string]: any;
             },
             now: Item,
