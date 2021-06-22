@@ -131,16 +131,15 @@ export type Item = {
   label: string;
   prop: string;
   span: number;
-  placeholder: string;
+  rules: Rule | Rule[];
   slot: boolean;
   formSlot: boolean;
+  placeholder: string;
   clearable: boolean;
   readonly: boolean;
   disabled: boolean;
   row: boolean;
   linefeed: boolean;
-  rules: Rule | Rule[];
-  props: FormItem;
   required: boolean;
   requiredErrMsg: string;
   isHideEditPlaceholder: boolean;
@@ -287,7 +286,7 @@ export default class FormEngine extends Vue {
       ? `请${item.type === 'select' ? '选择' : '输入'}`
       : '';
     const cProps = item?.componentProps;
-    const isHideEditPlaceholder = item.isHideEditPlaceholder || this.isHideEditPlaceholder;
+    const isHideEditPlaceholder = item.isHideEditPlaceholder ?? this.isHideEditPlaceholder;
 
     // eslint-disable-next-line no-shadow
     const getText = (text: string) => (this.disabled
