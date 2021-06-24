@@ -12,6 +12,7 @@ const typescript = require("rollup-plugin-typescript2");
 const pkg = require("../package.json");
 const { DEFAULT_EXTENSIONS } = require("@babel/core");
 const replace = require("@rollup/plugin-replace");
+const strip = require('@rollup/plugin-strip');
 
 const deps = ["vue", "core-js", "element-ui", ...Object.keys(Object.assign({}, pkg.dependencies))];
 const foldPath = path.resolve(__dirname, `..`);
@@ -74,6 +75,11 @@ const runBuild = async () => {
           extensions: [".mjs", ".js", ".json", ".node", ...commonExtensions]
         }),
         vue(),
+        strip(
+          {
+            include: ['**/*.ts']
+          }
+        ),
         babel({
           babelHelpers: "runtime",
           extensions: [...DEFAULT_EXTENSIONS, ...commonExtensions]

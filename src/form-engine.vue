@@ -111,7 +111,7 @@ import {
   Component, Vue, Watch, Prop,
 } from 'vue-property-decorator';
 import {
-  Form, FormItem, Row, Col,
+  Form, Row, Col,
 } from 'element-ui';
 import {
   camelCase, cloneDeep, isEqual, merge,
@@ -250,10 +250,6 @@ export default class FormEngine extends Vue {
 
   isChangeValidateRule = false;
 
-  created() {
-    this.init();
-  }
-
   // eslint-disable-next-line class-methods-use-this
   getAttrValue(dataSource: any = {}, key: string, defalutValue: any) {
     console.log(dataSource?.[key] ?? dataSource?.[camelCase(key)] ?? defalutValue);
@@ -322,6 +318,14 @@ export default class FormEngine extends Vue {
   init() {
     this.handleFormData(true);
     this.handleRules(true);
+
+    const styleText = '.form-engine .el-row { display: flex;flex-wrap: wrap; } .form-engine .form-engine__item { width: 100%; }';
+
+    const style = document.createElement('style');
+    style.innerHTML = styleText;
+    style.type = 'text/css';
+
+    document.head.appendChild(style);
   }
 
   handleFormData(isInit?: boolean) {
@@ -436,6 +440,10 @@ export default class FormEngine extends Vue {
     });
   }
 
+  created() {
+    this.init();
+  }
+
   clearValidate(props?: string[] | string) {
     if (this.$refs?.form) this.$refs.form.clearValidate(props);
   }
@@ -463,14 +471,3 @@ export default class FormEngine extends Vue {
   }
 }
 </script>
-
-<style>
-.form-engine .el-col .form-engine__item {
-  width: 100%;
-}
-
-.form-engine .el-row {
-  display: flex;
-  flex-wrap: wrap;
-}
-</style>

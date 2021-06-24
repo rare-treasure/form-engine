@@ -948,6 +948,15 @@
     "@rollup/pluginutils" "^3.1.0"
     magic-string "^0.25.7"
 
+"@rollup/plugin-strip@^2.0.1":
+  version "2.0.1"
+  resolved "http://npm.mirrors.dg.com/@rollup%2fplugin-strip/-/plugin-strip-2.0.1.tgz#276e7789a33ae0b10bc8522a20f187d8a6b6b550"
+  integrity sha512-+JJInHt/90Ta/ofCH+YHrI6nyDKe9jVzwBkmnakjDUMD+2QUTPHy60jep+kaMm4ARKWavtfmPbQp7e+xxAHU7g==
+  dependencies:
+    "@rollup/pluginutils" "^3.1.0"
+    estree-walker "^2.0.1"
+    magic-string "^0.25.7"
+
 "@rollup/pluginutils@^3.0.8", "@rollup/pluginutils@^3.1.0":
   version "3.1.0"
   resolved "https://registry.npm.taobao.org/@rollup/pluginutils/download/@rollup/pluginutils-3.1.0.tgz?cache=0&sync_timestamp=1603767889260&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40rollup%2Fpluginutils%2Fdownload%2F%40rollup%2Fpluginutils-3.1.0.tgz#706b4524ee6dc8b103b3c995533e5ad680c02b9b"

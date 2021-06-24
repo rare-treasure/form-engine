@@ -1,5 +1,5 @@
 import { Vue } from 'vue-property-decorator';
-import { Form, FormItem, Row, Col } from 'element-ui';
+import { Form, Row, Col } from 'element-ui';
 import { ValidateCallback, ValidateFieldCallback } from 'element-ui/types/form.d';
 export declare type Rule = {
     [key: string]: any;
@@ -12,16 +12,15 @@ export declare type Item = {
     label: string;
     prop: string;
     span: number;
-    placeholder: string;
+    rules: Rule | Rule[];
     slot: boolean;
     formSlot: boolean;
+    placeholder: string;
     clearable: boolean;
     readonly: boolean;
     disabled: boolean;
     row: boolean;
     linefeed: boolean;
-    rules: Rule | Rule[];
-    props: FormItem;
     required: boolean;
     requiredErrMsg: string;
     isHideEditPlaceholder: boolean;
@@ -58,7 +57,6 @@ export default class FormEngine extends Vue {
         form: Form;
     };
     isChangeValidateRule: boolean;
-    created(): void;
     getAttrValue(dataSource: any, key: string, defalutValue: any): any;
     getComponentName(type: string): string;
     getPlaceholder(item: Item): any;
@@ -66,6 +64,7 @@ export default class FormEngine extends Vue {
     init(): void;
     handleFormData(isInit?: boolean): void;
     handleRules(isInit?: boolean): void;
+    created(): void;
     clearValidate(props?: string[] | string): void;
     resetFields(): void;
     validateField(props: string[] | string, cb?: ValidateFieldCallback): void;
