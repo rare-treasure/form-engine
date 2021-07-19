@@ -251,7 +251,7 @@ export default class FormEngine extends Vue {
   isChangeValidateRule = false;
 
   // eslint-disable-next-line class-methods-use-this
-  getAttrValue(dataSource: any = {}, key: string, defalutValue: any) {
+  getAttrValue(dataSource: any = (this ?? {}), key: string, defalutValue: any) {
     console.log(dataSource?.[key] ?? dataSource?.[camelCase(key)] ?? defalutValue);
     return dataSource?.[key] ?? dataSource?.[camelCase(key)] ?? defalutValue;
   }
