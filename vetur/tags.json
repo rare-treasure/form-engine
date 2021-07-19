@@ -1,6 +1,6 @@
 {
   "form-engine": {
-    "attributes": ["items", "rules", "form-data", "row-props", "row-on", "col-props", "col-on", "span", "clearable", "disabled", "not-edit-hide-placeholder"],
+    "attributes": ["items", "rules", "form-data", "row-props", "row-on", "col-props", "col-on", "span", "clearable", "disabled", "readonly", "not-edit-hide-placeholder"],
     "description": "form-engine, A PC form engine based on Vue + element UI. Support flexible configuration items, edit / view two views, custom template / slot, overflow hide, double-click copy, etc."
   }
 }

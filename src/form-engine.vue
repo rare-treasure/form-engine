@@ -46,9 +46,21 @@
                 :is="getComponentName(item.type)"
                 :placeholder="getPlaceholder(item)"
                 :type="item.type"
-                :clearable="item.clearable || clearable"
-                :disabled="item.disabled || disabled"
-                :readonly="item.readonly"
+                :clearable="getAttrValue(
+                  getAttrValue(item, 'component-props', item),
+                  'clearable',
+                  getAttrValue(item, 'clearable', clearable)
+                )"
+                :disabled="getAttrValue(
+                  getAttrValue(item, 'component-props', item),
+                  'disabled',
+                  getAttrValue(item, 'disabled', disabled)
+                )"
+                :readonly="getAttrValue(
+                  getAttrValue(item, 'component-props', item),
+                  'readonly',
+                  getAttrValue(item, 'readonly', readonly)
+                )"
               >
                 <template v-if="item.type === 'select'">
                   <el-option
@@ -209,6 +221,9 @@ export default class FormEngine extends Vue {
   @Prop(Boolean)
   clearable!: boolean;
 
+  @Prop(Boolean)
+  readonly!: boolean;
+
   @Watch('items', {
     deep: true,
   })
@@ -281,15 +296,12 @@ export default class FormEngine extends Vue {
     const text = /(input|select|autocomplete)$/.test(cName)
       ? `请${item.type === 'select' ? '选择' : '输入'}`
       : '';
-    const cProps = item?.componentProps;
+    const cProps = this.getAttrValue(item, 'component-props', {});
     const isHideEditPlaceholder = item.isHideEditPlaceholder ?? this.isHideEditPlaceholder;
 
     // eslint-disable-next-line no-shadow
-    const getText = (text: string) => (this.disabled
-      || item.disabled
-      || item.readonly
-      || cProps?.disabled
-      || cProps?.readonly
+    const getText = (text: string) => (((cProps?.disabled ?? item.disabled ?? this.disabled) || (
+      cProps?.readonly ?? item.readonly ?? this.readonly))
       ? ''
       : text);
 

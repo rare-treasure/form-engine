@@ -19,6 +19,10 @@
     "type": "boolean",
     "description": "disable all components within the el-form, default: false"
   },
+  "readonly": {
+    "type": "boolean",
+    "description": "readonly all components within the el-form, default: false"
+  },
   "form-data": {
     "type": "object",
     "description": "data of form component, default: {}"
